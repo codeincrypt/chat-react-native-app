@@ -1,0 +1,4 @@
+export const ACTIONS = {
+  GET_PROFILE: "GET_PROFILE",
+  LOGIN :"LOGIN"
+}
