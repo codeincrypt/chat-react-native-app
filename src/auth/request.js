@@ -5,12 +5,12 @@ const headers = {
   apikey: API_KEY,
 };
 
-export const getLoginMobile = async (mobile) => {
-  const response = await fetch(`${URL_STRING}/authuser/login-email`, {
+export const getLoginMobile = async (username) => {
+  const response = await fetch(`${URL_STRING}/authuser/login-username`, {
     method:'POST',
     headers,
     body: JSON.stringify({
-      mobile,
+      username,
     }),
   });
   const data = await response.json();

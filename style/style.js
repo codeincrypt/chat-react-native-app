@@ -5,14 +5,7 @@ import {
   fontFamilyNormal,
   fontFamilyRegular,
 } from '../constant/fonts';
-import {
-  PRIMARYCOLOR,
-  PRIMARYBGCOLOR,
-  SECONDCOLOR,
-  SECONDBGCOLOR,
-  SECONDCOLOR2,
-  SECONDBGCOLOR2,
-} from '../constant/color';
+
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
 
@@ -106,6 +99,12 @@ export default StyleSheet.create({
   },
 
   smalldefaultbtn: {
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#DDD',
+  },
+
+  inputBtn: {
     borderRadius: 5,
     borderWidth: 1,
     borderColor: '#DDD',
@@ -333,6 +332,13 @@ export default StyleSheet.create({
     borderRadius: 10,
     margin: 10,
     padding: 8,
+    backgroundColor: '#222',
+  },
+  roundfloatbtn : {
+    width:60,
+    height:60,
+    borderRadius: 30,
+    padding: 5,
     backgroundColor: '#222',
   },
   darkbtntext: {

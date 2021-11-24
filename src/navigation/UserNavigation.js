@@ -87,7 +87,7 @@ export const UserNavigator = ({navigation}) => {
   return (
     <UserDrawerNavigator.Navigator
       initialRouteName="Home"
-      drawerContent={props => <DrawerContent {...props} />}
+      // drawerContent={props => <DrawerContent {...props} />}
       drawerContentOptions={{ activeTintColor: '#352562' }}>
       <UserDrawerNavigator.Screen name="Home" component={createHomeStack} options={{headerShown: false}} />
       {/* <UserDrawerNavigator.Screen name="Myaccount" component={createProfileStack} options={{headerShown: false}} /> */}

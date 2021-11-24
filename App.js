@@ -89,13 +89,13 @@ const App = () => {
     //   else {
     return (
       <UserContext.Provider value={authContext}>
-        <StatusBar backgroundColor="#ce0041" />
+        <StatusBar backgroundColor="#000" />
         <NavigationContainer>
-          {/* {loginstate.userToken === null ? (
+          {loginstate.userToken === null ? (
             <LoginNavigation />
-          ) : ( */}
+          ) : (
             <UserNavigator />
-          {/* )} */}
+          )}
         </NavigationContainer>
       </UserContext.Provider>
     );
@@ -109,8 +109,8 @@ const App = () => {
         isLoaded={loginstate.loader}
         logoImage={require('./assets/image/chatapp-white.png')}
         backgroundColor={'#000'}
-        logoHeight={200}
-        logoWidth={200}>
+        logoHeight={100}
+        logoWidth={100}>
         {display()}
       </AnimatedSplash>
     </>
