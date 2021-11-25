@@ -17,14 +17,11 @@ export const getLoginMobile = async (username) => {
   return data
 };
 
-export const getLoginPassword = async (mobile, password) => {
-  const response = await fetch(`${URL_STRING}/authuser/merchant-login-password`, {
+export const getLoginPassword = async (username, password) => {
+  const response = await fetch(`${URL_STRING}/authuser/login-password`, {
     method:'POST',
     headers,
-    body: JSON.stringify({
-      mobile,
-      password,
-    }),
+    body: JSON.stringify({username, password}),
   });
   const data = await response.json();
   return data

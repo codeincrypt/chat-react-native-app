@@ -1,4 +1,4 @@
-package com.chatapp;
+package com.intagedesign.chat;
 
 import com.facebook.react.ReactActivity;
 

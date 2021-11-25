@@ -41,7 +41,7 @@ export default StyleSheet.create({
     top: 0,
   },
   header: {
-    backgroundColor: '#FFF',
+    backgroundColor: '#222',
     position: 'relative',
     left: 0,
     right: 0,
@@ -53,7 +53,7 @@ export default StyleSheet.create({
     // marginLeft: -50,
     // fontFamily: fontFamilyNormal,
     // alignSelf: 'center',
-    color: '#E30047',
+    color: '#FFF',
   },
   title: {
     fontSize: 18,
@@ -434,4 +434,51 @@ bluebox: {
     padding: 16,
     paddingBottom: 75,
 },
+textinput: {colors: {primary: '#000'}},
+
+lists: {
+  flexDirection: 'row',
+  flex: 1,
+  padding: 10,
+  marginTop: 10,
+  backgroundColor: '#f3f3f3',
+  borderRadius: 10,
+},
+listicons: {
+  flex: 2,
+},
+listicons2: {
+  flex: 2,
+  alignSelf: 'center',
+  alignItems: 'flex-end',
+  marginRight: 10,
+},
+listbody: {
+  flex: 5,
+  paddingLeft: 12,
+},
+listicon: {
+  padding: 13,
+  backgroundColor: '#fff',
+  width: 55,
+  height: 55,
+  borderRadius: 30,
+},
+listimage: {
+  padding: 10,
+  height: 30,
+  width: '100%',
+  resizeMode: 'contain',
+  alignItems: 'center',
+},
+
+contactname: {
+    fontSize: 14,
+    fontWeight: '700',
+},
+contactnumber: {
+    fontSize: 13,
+    color: '#000',
+},
+
 });

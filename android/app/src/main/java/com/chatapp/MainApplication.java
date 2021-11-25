@@ -1,4 +1,4 @@
-package com.chatapp;
+package com.intagedesign.chat;
 
 import android.app.Application;
 import android.content.Context;

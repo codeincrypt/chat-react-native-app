@@ -11,10 +11,11 @@ import {
   ToastAndroid,
   ScrollView,
 } from 'react-native';
-import {TextInput, Button, Snackbar} from 'react-native-paper';
+import {TextInput, Button, Snackbar, Appbar} from 'react-native-paper';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-fast-toast';
+import {PERMISSIONS, requestMultiple, checkMultiple} from 'react-native-permissions';
 
 import {UserContext} from '../../App';
 import style from '../../style/style';
@@ -26,6 +27,7 @@ import {
 } from '../../constant/fonts';
 import {
   getLoginMobile,
+  getLoginPassword,
   getCreateAccount,
   getVerifyOTP,
   getResendOTP,
@@ -38,8 +40,14 @@ import {APPSVERSION} from '../../constant/config';
 const LoginScreen = ({navigation, onDone}) => {
   const toast = useRef(null);
 
-  const {signInFirst} = useContext(UserContext);
+  const [visible, setVisible] = React.useState(false);
+
+  const onToggleSnackBar = () => setVisible(!visible);
+  const onDismissSnackBar = () => setVisible(false);
+
+  const {signIn} = useContext(UserContext);
   // LOGIN
+  const [username, setUsername] = useState('');
   const [mobile, setMobile] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -58,6 +66,7 @@ const LoginScreen = ({navigation, onDone}) => {
   const [btnLoginloading, setBtnLoginloading] = useState(false);
 
   const [login, setLogin] = useState(true);
+  const [loginpassword, setLoginPassword] = useState(true);
   const [signup, setSignup] = useState(false);
   const [forgot, setForgot] = useState(false);
   const [forgototp, setForgotOtp] = useState(false);
@@ -71,6 +80,95 @@ const LoginScreen = ({navigation, onDone}) => {
 
   useEffect(() => {
     appsetting();
+
+    try {
+      requestMultiple(
+        Platform.select({
+          android: [PERMISSIONS.ANDROID.READ_SMS, PERMISSIONS.ANDROID.RECEIVE_SMS, PERMISSIONS.ANDROID.READ_CONTACTS],
+        }),
+      ).then(() => {
+        checkMultiple([PERMISSIONS.ANDROID.READ_SMS, PERMISSIONS.ANDROID.RECEIVE_SMS, PERMISSIONS.ANDROID.READ_CONTACTS]).then((statuses) => {
+          if (statuses[PERMISSIONS.ANDROID.READ_SMS] === 'denied' || statuses[PERMISSIONS.RECEIVE_SMS] === 'denied' || statuses[PERMISSIONS.READ_CONTACTS] === 'denied') {
+            console.log('denied');
+            Alert.alert(
+              'Warning!',
+              'All services needs to be enabled',
+              [
+                {
+                  text: 'Cancel',
+                  onPress: () => props.navigation.navigate('Swipe'),
+                  style: 'cancel',
+                },
+                {
+                  text: 'OK',
+                  onPress: () => props.navigation.navigate('Swipe'),
+                },
+              ],
+              { cancelable: false },
+            );
+          }
+          console.log('location', statuses);
+          if (statuses[PERMISSIONS.ANDROID.READ_SMS] === 'granted' && statuses[PERMISSIONS.ANDROID.RECEIVE_SMS] === 'granted' && statuses[PERMISSIONS.ANDROID.READ_CONTACTS] === 'granted') {
+            console.log(statuses);
+            // DeviceInfo.syncUniqueId().then(uniqueId => {
+            //   setDevice(uniqueId)
+            // });
+            
+            let deviceId = DeviceInfo.getDeviceId();
+
+              // DeviceInfo.getDeviceName().then(deviceName => {
+              //   console.log('deviceName', deviceName)
+              //   setDeviceName(deviceName)
+              // });
+
+              // let model = DeviceInfo.getModel();
+              // setModel(model)
+              // console.log('model', model)
+
+              // let systemName = DeviceInfo.getSystemName();
+              // setSystemName(systemName)
+              // console.log('systemName', systemName)
+              
+              // let systemVersion = DeviceInfo.getSystemVersion();
+              // console.log('systemVersion', systemVersion)
+              // setSystemVersion(systemVersion)
+              
+              // let brand = DeviceInfo.getBrand();
+              // setBrands(brand)
+              // console.log('brands', brand)
+
+              // DeviceInfo.getPhoneNumber()
+              // .then(phoneNumber => {
+              //   setPhonenumber(phoneNumber)
+              //   console.log('phoneNumber', phoneNumber)
+              // });
+              
+            
+          } else {
+            console.log('else');
+            Alert.alert(
+              'Warning!',
+              'All services needs to be enabled',
+              [
+                {
+                  text: 'Cancel',
+                  onPress: () => props.navigation.navigate('SliderScreen'),
+                  style: 'cancel',
+                },
+                {
+                  text: 'OK',
+                  onPress: () => props.navigation.navigate('SliderScreen'),
+                },
+              ],
+              { cancelable: false },
+            );
+          }
+        });
+      });
+    } catch (error) {
+      console.log('location set error:', error);
+    }
+
   }, []);
 
   const appsetting = () => {
@@ -112,7 +210,7 @@ const LoginScreen = ({navigation, onDone}) => {
   const refRBSheet = useRef();
   // LOGIN A/C
   const Loginnow = () => {
-    if (mobile === '') {
+    if (username === '') {
       return toast.current.show('Enter your mobile or email', {type: 'danger'});
     }
 
@@ -121,26 +219,42 @@ const LoginScreen = ({navigation, onDone}) => {
       return re.test(email);
     }
 
-    var checkdata = validateEmail(mobile);
-    console.log(checkdata);
+    var checkdata = validateEmail(username);
     if (checkdata === true) {
-      setEmail(mobile);
+      setEmail(username);
     } else {
-      setEmail(mobile);
+      setEmail(username);
     }
-    console.log('checkdata', checkdata, mobile);
-    getLoginMobile(mobile).then(async result => {
+    // console.log('checkdata', checkdata, mobile);
+    getLoginMobile(username).then(async result => {
       console.log('result', result);
-      // if (result.status === 'fail') {
-      //   setBtnLoginloading(false);
-      //   return toast.current.show(result.message, {type: 'danger'});
-      // } else {
-        //setIsloading(true);
-        // toast.current.show(result.message, {type: 'success'});
-        // await signInFirst(result.token);
-      // }
+      if (result.status === 'fail') {
+        setBtnLoginloading(false);
+        return toast.current.show(result.message, {type: 'danger'});
+      } else {
+        // setIsloading(true);
+        setLogin(false);
+        setLoginPassword(true);
+        toast.current.show(result.message, {type: 'success'});
+      }
     });
   };
+
+  const Passwordnow = () => {
+    if (password === '') {
+      return toast.current.show('Enter your mobile or email', {type: 'danger'});
+    }
+    getLoginPassword(username, password).then(async result => {
+      console.log('result', result);
+      if (result.status === 'fail') {
+        setBtnLoginloading(false);
+        return toast.current.show(result.message, {type: 'danger'});
+      } else {
+        toast.current.show(result.message, {type: 'success'});
+        await signIn(result.token);
+      }
+    });
+  }
   // // REGISTER A/C
   // const RegisterAccount = () => {
   //   if (name === '' && name.toString().trim().length < 3) {
@@ -204,6 +318,12 @@ const LoginScreen = ({navigation, onDone}) => {
   if (login) {
     return (
       <SafeAreaView style={styles.body}>
+        <Appbar.Header style={style.header}>
+          <Appbar.Content
+            title="Your Phone"
+            titleStyle={style.headertitle}
+          />
+        </Appbar.Header>
         <Toast ref={toast} duration={3000} />
         <View style={{padding: 15}}>
           <View style={{marginTop: 50}}>
@@ -211,9 +331,9 @@ const LoginScreen = ({navigation, onDone}) => {
               label="Mobile or Email Id"
               mode="outlined"
               style={style.inputBox}
-              value={mobile}
-              onChangeText={setMobile}
-              theme={{colors: {primary: '#000'}}}
+              value={username}
+              onChangeText={setUsername}
+              theme={style.textinput}
             />
 
             <TouchableOpacity onPress={setShowForgot}>
@@ -234,10 +354,9 @@ const LoginScreen = ({navigation, onDone}) => {
         <View style={styles.roundbtnabs}>
           <Button
             mode="contained"
-            color="#000"
             style={styles.roundbtn}
             onPress={Loginnow}>
-            <Icon name={'facebook'} size={22} color="#FFF" />
+            <Icon name={'arrow-right'} size={26} color="#FFF" />
           </Button>
         </View>
 
@@ -263,6 +382,56 @@ const LoginScreen = ({navigation, onDone}) => {
             </View>
           </View>
         </Modal>
+
+        <Snackbar
+          visible={visible}
+          onDismiss={onDismissSnackBar}
+          // action={{
+          //   label: 'Undo',
+          //   onPress: () => {
+          //     // Do something
+          //   },
+          // }}
+          >
+          Mobile/ Email Verified. Please 
+        </Snackbar>
+
+      </SafeAreaView>
+    );
+  }
+
+  if (loginpassword) {
+    return (
+      <SafeAreaView style={styles.body}>
+        <Appbar.Header style={style.header}>
+          <Appbar.Content
+            title="Your Password"
+            titleStyle={style.headertitle}
+          />
+        </Appbar.Header>
+        <Toast ref={toast} duration={3000} />
+        <View style={{padding: 15}}>
+          <View style={{marginTop: 50}}>
+            <TextInput
+              label="Password"
+              mode="outlined"
+              style={style.inputBox}
+              value={password}
+              onChangeText={setPassword}
+              theme={style.textinput}
+            />
+          </View>
+        </View>
+
+        <View style={styles.roundbtnabs}>
+          <Button
+            mode="contained"
+            style={styles.roundbtn}
+            onPress={Passwordnow}>
+            <Icon name={'arrow-right'} size={26} color="#FFF" />
+          </Button>
+        </View>
+
       </SafeAreaView>
     );
   }
@@ -506,15 +675,16 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   roundbtn: {
-    // padding: 8,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    borderWidth:1,
+    alignItems:'center',
+    justifyContent:'center',
+    width:65,
+    height:65,
+    backgroundColor:'#000',
+    borderRadius:40,
   },
   roundbtnabs: {
-    alignSelf: 'flex-end',
     position: 'absolute',
-    left: 0,
     right: 0,
     bottom: 0,
     padding: 15,
@@ -552,7 +722,7 @@ const styles = StyleSheet.create({
   },
   body: {
     backgroundColor: 'white',
-    padding: 10,
+    // padding: 10,
     width: '100%',
     height: '100%',
   },
