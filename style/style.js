@@ -205,30 +205,31 @@ export default StyleSheet.create({
     borderRadius: 15,
     margin: 5,
   },
-  
+
   notificationcard: {
     backgroundColor: '#E30047',
     borderRadius: 10,
-    elevation:4,
+    elevation: 4,
     padding: 15,
     margin: 5,
-    flexDirection: 'row', padding: 20
+    flexDirection: 'row',
+    padding: 20,
   },
 
   card: {
     backgroundColor: '#FFF',
     borderRadius: 10,
-    elevation:4,
+    elevation: 4,
     padding: 15,
     margin: 5,
   },
   boxcard: {
     backgroundColor: '#FFF',
-    elevation:4,
+    elevation: 4,
     borderRadius: 10,
     margin: 5,
-    flex:1,
-    padding:20
+    flex: 1,
+    padding: 20,
   },
   boxcardtext: {
     fontSize: 30,
@@ -328,15 +329,15 @@ export default StyleSheet.create({
     padding: 8,
     backgroundColor: '#222',
   },
-  bottomdarkbtn : {
+  bottomdarkbtn: {
     borderRadius: 10,
     margin: 10,
     padding: 8,
     backgroundColor: '#222',
   },
-  roundfloatbtn : {
-    width:60,
-    height:60,
+  roundfloatbtn: {
+    width: 60,
+    height: 60,
     borderRadius: 30,
     padding: 5,
     backgroundColor: '#222',
@@ -410,75 +411,76 @@ export default StyleSheet.create({
     marginBottom: 25,
     resizeMode: 'contain',
   },
-  popsubtitle : {
+  popsubtitle: {
     color: '#BBB',
     fontFamily: fontFamilyNormal,
     fontSize: 12,
-    textTransform:'uppercase'
+    textTransform: 'uppercase',
   },
-  poptitle : {
+  poptitle: {
     color: '#000',
     fontFamily: fontFamilyNormal,
     fontSize: 17,
   },
-  
+
   blueboxbg: {
     width: '100%',
     height: '100%',
     flex: 1,
-},
-bluebox: {
+  },
+  bluebox: {
     width: '100%',
     flexDirection: 'row',
     flex: 1,
     padding: 16,
     paddingBottom: 75,
-},
-textinput: {colors: {primary: '#000'}},
+  },
+  textinput: {colors: {primary: '#000'}},
 
-lists: {
-  flexDirection: 'row',
-  flex: 1,
-  padding: 10,
-  marginTop: 10,
-  backgroundColor: '#f3f3f3',
-  borderRadius: 10,
-},
-listicons: {
-  flex: 2,
-},
-listicons2: {
-  flex: 2,
-  alignSelf: 'center',
-  alignItems: 'flex-end',
-  marginRight: 10,
-},
-listbody: {
-  flex: 5,
-  paddingLeft: 12,
-},
-listicon: {
-  padding: 13,
-  backgroundColor: '#fff',
-  width: 55,
-  height: 55,
-  borderRadius: 30,
-},
-listimage: {
-  padding: 10,
-  height: 30,
-  width: '100%',
-  resizeMode: 'contain',
-  alignItems: 'center',
-},
+  lists: {
+    flexDirection: 'row',
+    flex: 1,
+    paddingHorizontal: 10,
+    marginVertical: 5,
+    borderBottomColor: '#EEE',
+    borderBottomWidth: 1,
+  },
+  listicons: {
+    flex: 2,
+  },
+  listicons2: {
+    flex: 2,
+    alignSelf: 'center',
+    alignItems: 'flex-end',
+    marginRight: 10,
+  },
+  listbody: {
+    flex: 5,
+    paddingLeft: 12,
+  },
+  listicon: {
+    padding: 13,
+    backgroundColor: '#fff',
+    width: 55,
+    height: 55,
+    borderRadius: 30,
+  },
+  listimage: {
+    padding: 10,
+    height: 30,
+    width: '100%',
+    resizeMode: 'contain',
+    alignItems: 'center',
+  },
 
-contactname: {
-    fontSize: 14,
-    fontWeight: '700',
-},
-contactnumber: {
-    fontSize: 13,
+  contactname: {
+    fontSize: 17,
     color: '#000',
-},
-
+    fontWeight: '700',
+  },
+  contactnumber: {
+    marginTop: 4,
+    fontSize: 14,
+    color: '#000',
+  },
 });

@@ -114,7 +114,7 @@ const LoginScreen = ({navigation, onDone}) => {
             //   setDevice(uniqueId)
             // });
             
-            let deviceId = DeviceInfo.getDeviceId();
+            // let deviceId = DeviceInfo.getDeviceId();
 
               // DeviceInfo.getDeviceName().then(deviceName => {
               //   console.log('deviceName', deviceName)
@@ -382,19 +382,6 @@ const LoginScreen = ({navigation, onDone}) => {
             </View>
           </View>
         </Modal>
-
-        <Snackbar
-          visible={visible}
-          onDismiss={onDismissSnackBar}
-          // action={{
-          //   label: 'Undo',
-          //   onPress: () => {
-          //     // Do something
-          //   },
-          // }}
-          >
-          Mobile/ Email Verified. Please 
-        </Snackbar>
 
       </SafeAreaView>
     );

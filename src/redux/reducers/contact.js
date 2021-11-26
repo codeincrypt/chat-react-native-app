@@ -1,18 +1,11 @@
 import { ACTIONS } from "../types"
 
-const intitial_state = {
-  "id": "",
-  "name": "",
-  "email": "",
-  "contact": "",
-  "status": "",
-  "photo": ""
-}
+const intitial_state = {}
 
 export default (state = intitial_state, action) => {
 
   switch(action.type) {
-    case ACTIONS.GET_PROFILE:
+    case ACTIONS.GET_CONTACT:
       return {...action.payload}
     default:
       return state  

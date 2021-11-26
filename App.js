@@ -10,6 +10,8 @@ import {WEBSOCKET} from './constant/config';
 import io from 'socket.io-client/dist/socket.io';
 // import AppNavigator from './navigation/AppNavigator';
 import {loginReducer, initialLoginState} from './src/redux/reducers/userReducer';
+import { Provider } from "react-redux";
+import store from "./src/redux/store";
 
 // import NetInfo from '@react-native-community/netinfo';
 // import NoInternetConnection from './src/screen/nointernet';
@@ -34,7 +36,8 @@ const App = () => {
   const authContext = useMemo(() => ({
     signIn: async (token, details, partnerid) => {
       try {
-        await AsyncStorage.setItem('lvkartmerchanttoken', token);
+        console.log('token0', token)
+        await AsyncStorage.setItem('thelvchatapp', token);
         await AsyncStorage.setItem('user', details);
         await AsyncStorage.setItem('socket', partnerid);
         socket.emit('userjoin', {userid: partnerid});
@@ -45,7 +48,7 @@ const App = () => {
     },
     signOut: async () => {
       try {
-        await AsyncStorage.removeItem('lvkartmerchanttoken');
+        await AsyncStorage.removeItem('thelvchatapp');
         await AsyncStorage.removeItem('user');
       } catch (e) {
         console.log(e);
@@ -67,7 +70,7 @@ const App = () => {
       let token = null;
       let user = null;
       try {
-        token = await AsyncStorage.getItem('lvkartmerchanttoken');
+        token = await AsyncStorage.getItem('thelvchatapp');
         user = await AsyncStorage.getItem('user');
       } catch (e) {
         console.log(e);
@@ -88,6 +91,7 @@ const App = () => {
     //   }
     //   else {
     return (
+      <Provider store={store}>
       <UserContext.Provider value={authContext}>
         <StatusBar backgroundColor="#000" />
         <NavigationContainer>
@@ -98,6 +102,7 @@ const App = () => {
           )}
         </NavigationContainer>
       </UserContext.Provider>
+      </Provider>
     );
     //   }
     // });

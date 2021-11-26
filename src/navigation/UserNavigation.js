@@ -58,7 +58,7 @@ const createContactStack = ({navigation}) => {
         headerTintColor: 'transparent',
       }}>
       <ContactStack.Screen
-        name="Contact"
+        name="ContactScreen"
         component={ContactList}
         options={{
           headerShown:false
@@ -91,15 +91,15 @@ const createProfileStack = ({navigation}) => {
 export const UserNavigator = ({navigation}) => {
   return (
     <Stack.Navigator
-      initialRouteName="Home"
+      initialRouteName="HomeScreen"
       drawerContent={(props) => <BottomContent {...props} />}
       drawerContentOptions={{
         activeTintColor: '#352562',
       }}
       >
-      <Stack.Screen name="Home" component={createHomeStack} options={{headerShown:false}} />
+      <Stack.Screen name="HomeScreen" component={createHomeStack} options={{headerShown:false}} />
       <Stack.Screen name="Contact" component={createContactStack} options={{headerShown:false}} />
-      <Stack.Screen name="Myaccount" component={createProfileStack} options={{headerShown:false}} />
+      <Stack.Screen name="MyaccountScreen" component={createProfileStack} options={{headerShown:false}} />
     </Stack.Navigator>
   );
 };

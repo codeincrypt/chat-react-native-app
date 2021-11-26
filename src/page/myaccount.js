@@ -12,18 +12,17 @@ import {
 import {UserContext} from '../../App';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import AsyncStorage from '@react-native-community/async-storage';
+
+import {connect} from 'react-redux'
+import { GET_PROFILE, GET_CHATLIST } from '../redux/actions/request';
 
 import Bottom from '../navs/Bottom';
-// import Loader from '../../constant/loader';
-
 import {
   fontFamilyThin,
   fontFamilyNormal,
   fontFamilyRegular,
   fontFamilyBold,
 } from '../../constant/fonts';
-// import {getProfile} from '../request/userrequest';
 import style from '../../style/style.js';
 
 const MyaccountScreen = props => {
@@ -34,6 +33,7 @@ const MyaccountScreen = props => {
   const [profiledata, setProfileData] = useState('');
   const [profileimg, setProfileimg] = useState('https://api.lvkart.com/default/default-user.png');
 
+  props.GET_PROFILE((data) => setProfileData(data), (e) => console.log({e}))
 
   const signOuts = () => {
     signOut();
@@ -88,7 +88,7 @@ const MyaccountScreen = props => {
             </>
           ) : null}
           <View style={{backgroundColor: '#FFF', marginBottom: 7}}>
-            {/* <View style={styles.profilebluebox}>
+            <View style={styles.profilebluebox}>
               <View style={styles.profile}>
                 <View style={{flex: 2}}>
                   <Avatar.Image
@@ -110,40 +110,19 @@ const MyaccountScreen = props => {
                     }}>
                     {profiledata.name}
                   </Text>
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      marginTop: 5,
-                      color: '#000',
-                      fontFamily: fontFamilyRegular,
-                    }}>
-                    ID :{profiledata.partnerid}
-                  </Text>
                 </View>
-                <View style={{flex: 2, alignItems: 'center'}}>
-                  <View style={style.pills}>
-                    <Text
-                      style={{
-                        fontSize: 18,
-                        color: '#000',
-                        fontFamily: fontFamilyBold,
-                      }}>
-                      {profiledata.rating}{' '}
-                      <Icon name="star" size={20} color="#f1c40f" />
-                    </Text>
-                  </View>
+                <View style={styles.profilebox}>
                   <Text
                     style={{
-                      fontSize: 14,
-                      marginTop: 5,
+                      fontSize: 24,
                       color: '#000',
-                      fontFamily: fontFamilyRegular,
+                      fontFamily: fontFamilyBold,
                     }}>
-                    rating
+                    {profiledata.contact}
                   </Text>
                 </View>
               </View>
-            </View> */}
+            </View>
             {/* <View style={{flexDirection: 'row'}}>
               <View style={styles.paymodeboxicon}>
                 <Image
@@ -372,4 +351,11 @@ const styles = StyleSheet.create({
     color: '#FFF',
   },
 });
-export default MyaccountScreen;
+// export default MyaccountScreen;
+const mapStateToProps = (state) => {
+  return {
+    state
+  }
+}
+
+export default connect(mapStateToProps,{GET_PROFILE})(MyaccountScreen);

@@ -67,7 +67,7 @@ const Bottom = ({props}) => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={e => RedirectModule('Myaccount')}
+            onPress={e => RedirectModule('MyaccountScreen')}
             style={styles.bottombtn}>
             <Image
               source={require('../../assets/image/icon2.png')}
