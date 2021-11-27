@@ -43,3 +43,34 @@ export const GET_CHATLIST =  (success,error) => async (dispatch) => {
       error(e)
   }
 }
+
+export const GET_CHATVIEW = async (id) => {
+  const token = await AsyncStorage.getItem('thelvchatapp');
+  const response = await fetch(`${URL_STRING}/user/userMessage/${id}`, {
+    method:'GET',
+    headers : {
+      'Content-type': 'application/json',
+      apikey: API_KEY,
+      Authorization: 'Bearer ' + token,
+    }
+  });
+  const data = await response.json();
+  return data;
+};
+
+export const sendMessage = async (userid, message) => {
+  const token = await AsyncStorage.getItem('thelvchatapp');
+  const response = await fetch(`${URL_STRING}/user/sendMessage`, {
+    method:'POST',
+    headers : {
+      'Content-type': 'application/json',
+      apikey: API_KEY,
+      Authorization: 'Bearer ' + token,
+    },
+    body: JSON.stringify({
+      userid, message
+    }),
+  });
+  const data = await response.json();
+  return data;
+};

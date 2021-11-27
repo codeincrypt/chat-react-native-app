@@ -227,7 +227,6 @@ const LoginScreen = ({navigation, onDone}) => {
     }
     // console.log('checkdata', checkdata, mobile);
     getLoginMobile(username).then(async result => {
-      console.log('result', result);
       if (result.status === 'fail') {
         setBtnLoginloading(false);
         return toast.current.show(result.message, {type: 'danger'});
@@ -245,7 +244,6 @@ const LoginScreen = ({navigation, onDone}) => {
       return toast.current.show('Enter your mobile or email', {type: 'danger'});
     }
     getLoginPassword(username, password).then(async result => {
-      console.log('result', result);
       if (result.status === 'fail') {
         setBtnLoginloading(false);
         return toast.current.show(result.message, {type: 'danger'});

@@ -4,7 +4,6 @@ import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {fontFamilyBold} from '../../constant/fonts';
 
 const ChatCompList = ({item, onPress}) => {
-  console.log('item', item)
   return (
     <TouchableOpacity onPress={onPress}>
     <View style={{flexDirection: 'row', marginTop: 18, paddingHorizontal: 15}}>

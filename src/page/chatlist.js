@@ -45,7 +45,7 @@ const ChatList = (props) => {
     } />;
   };
 
-  props.GET_PROFILE((data) => console.log(data), (e) => console.log({e}))
+  props.GET_PROFILE((data) => console.log('data'), (e) => console.log({e}))
   props.GET_CHATLIST((data) => setChatlist(data), (e) => console.log({e}))
 
   return (

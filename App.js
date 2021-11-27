@@ -36,7 +36,6 @@ const App = () => {
   const authContext = useMemo(() => ({
     signIn: async (token, details, partnerid) => {
       try {
-        console.log('token0', token)
         await AsyncStorage.setItem('thelvchatapp', token);
         await AsyncStorage.setItem('user', details);
         await AsyncStorage.setItem('socket', partnerid);
