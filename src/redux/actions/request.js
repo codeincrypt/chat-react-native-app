@@ -58,6 +58,36 @@ export const GET_CHATVIEW = async (id) => {
   return data;
 };
 
+export const getProfile = async () => {
+  const token = await AsyncStorage.getItem('thelvchatapp');
+  const response = await fetch(`${URL_STRING}/user/profile`, {
+    method:'GET',
+    headers : {
+      'Content-type': 'application/json',
+      apikey: API_KEY,
+      Authorization: 'Bearer ' + token,
+    }
+  });
+  const data = await response.json();
+  console.log('data', data);
+  return data;
+};
+
+export const getChatList = async () => {
+  const token = await AsyncStorage.getItem('thelvchatapp');
+  console.log('token', token);
+  const response = await fetch(`${URL_STRING}/user/userList`, {
+    method:'GET',
+    headers : {
+      'Content-type': 'application/json',
+      apikey: API_KEY,
+      Authorization: 'Bearer ' + token,
+    }
+  });
+  const data = await response.json();
+  return data;
+};
+
 export const sendMessage = async (userid, message) => {
   const token = await AsyncStorage.getItem('thelvchatapp');
   const response = await fetch(`${URL_STRING}/user/sendMessage`, {

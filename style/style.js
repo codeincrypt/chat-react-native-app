@@ -50,6 +50,10 @@ export default StyleSheet.create({
   listicons: {
     flex: 2,
   },
+  contactlisticons: {
+    flex: 2,
+    justifyContent: 'center', alignItems: 'center', alignContent: 'center', padding: 7 
+  },
   listicons2: {
     flex: 2,
     alignSelf: 'center',

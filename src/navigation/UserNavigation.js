@@ -18,13 +18,15 @@ const ContactStack = createStackNavigator();
 const Stack = createStackNavigator();
 const logoIcon = () => {
   return (
-    <View style={{width: 100, flexDirection: 'row'}}>
+    <View style={{width: '100%', flexDirection: 'row'}}>
       <Image
         source={require('../../assets/image/chatapp-white.png')}
         resizeMode={'contain'}
-        style={{width: '100%', height: 30, marginLeft: -20}}
+        style={{width: '30%', height: 30, marginLeft: -20}}
       />
-      <Text style={style.headertitle}>Chat App</Text>
+      <View style={{width:'70%'}}>
+      <Text style={style.headertitle}>ChatApp</Text>
+      </View>
     </View>
   );
 };

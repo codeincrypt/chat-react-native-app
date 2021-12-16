@@ -6,15 +6,17 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
+  TouchableHighlight,
   ScrollView,
   ToastAndroid,
 } from 'react-native';
 import {UserContext} from '../../App';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import ImagePicker from 'react-native-image-crop-picker';
 
-import {connect} from 'react-redux'
-import { GET_PROFILE, GET_CHATLIST } from '../redux/actions/request';
+import {connect} from 'react-redux';
+import {GET_PROFILE, GET_CHATLIST, getProfile} from '../redux/actions/request';
 
 import Bottom from '../navs/Bottom';
 import {
@@ -27,37 +29,45 @@ import style from '../../style/style.js';
 
 const MyaccountScreen = props => {
   const {signOut} = useContext(UserContext);
-  const [token, setToken] = useState('');
   const [loading, setIsloading] = useState(true);
 
-  const [profiledata, setProfileData] = useState('');
-  const [profileimg, setProfileimg] = useState('https://api.lvkart.com/default/default-user.png');
+  const [profiledata, setProfile] = useState('');
+  const [profileimg, setProfileimg] = useState(
+    'https://chatapi.lvkart.com/default/default-user.png',
+  );
 
-  props.GET_PROFILE((data) => setProfileData(data), (e) => console.log({e}))
+  // props.GET_PROFILE((data) => {
+  //   console.log('GET_PROFILE', data)
+  //   setProfileData(data)
+  //   setProfileimg(data.photo)
+  // }, (e) => console.log({e}))
+
+  const fetchProfile = () => {
+    getProfile().then(data => {
+      setProfile(data);
+      setProfileimg(data.photo);
+    });
+  };
 
   const signOuts = () => {
     signOut();
     setIsloading(true);
-    // tokennow();
   };
 
-  // const fetchProfile = e => {
-  //   getProfile(e).then(async result => {
-  //     if (result.status === 'fail') {
-  //       ToastAndroid.show(result.message, ToastAndroid.LONG);
-  //     } else {
-  //       setProfileimg(result.profileimg);
-  //       await setProfileData(result);
-  //       await setIsloading(false);
-  //     }
-  //   });
-  // };
+  const selectImage = () => {
+    ImagePicker.openPicker({
+      width: 300,
+      height: 300,
+      cropping: true,
+      compressImageQuality: 0.5,
+    }).then(image => {
+      setProfileimg(image.path);
+      changeProfilePhoto(image);
+    });
+  };
 
   useEffect(() => {
-    // tokennow();
-    // props.navigation.addListener('focus', () => {
-    //   tokennow();
-    // });
+    fetchProfile();
   }, []);
 
   if (loading) {
@@ -72,57 +82,32 @@ const MyaccountScreen = props => {
           <Appbar.Content title="My Account" titleStyle={style.headertitle} />
         </Appbar.Header>
         <ScrollView>
-          {profiledata.status === 0 ? (
-            <>
-              <View style={styles.kyccard}>
-                <View style={styles.kycicon}>
-                  <Icon name="info" size={20} color="#FFF" />
-                </View>
-                <View style={{flex: 8, paddingHorizontal: 10}}>
-                  <Text style={styles.kyctitle}>Verification pending</Text>
-                  <Text style={styles.kycsubtitle}>
-                    Your profile verification was still pending.
-                  </Text>
-                </View>
-              </View>
-            </>
-          ) : null}
-          <View style={{backgroundColor: '#FFF', marginBottom: 7}}>
-            <View style={styles.profilebluebox}>
-              <View style={styles.profile}>
-                <View style={{flex: 2}}>
-                  <Avatar.Image
-                    style={{
-                      backgroundColor: 'red',
-                    }}
-                    source={{
-                      uri: profileimg,
-                    }}
-                    size={70}
-                  />
-                </View>
-                <View style={styles.profilebox}>
-                  <Text
-                    style={{
-                      fontSize: 24,
-                      color: '#000',
-                      fontFamily: fontFamilyBold,
-                    }}>
-                    {profiledata.name}
-                  </Text>
-                </View>
-                <View style={styles.profilebox}>
-                  <Text
-                    style={{
-                      fontSize: 24,
-                      color: '#000',
-                      fontFamily: fontFamilyBold,
-                    }}>
-                    {profiledata.contact}
-                  </Text>
-                </View>
-              </View>
+          <View style={styles.profilebluebox}>
+            <View style={styles.profile}>
+              <Avatar.Image
+                style={{
+                  backgroundColor: '#fff',
+                }}
+                source={{
+                  uri: profileimg,
+                }}
+                size={120}
+              />
+              <TouchableHighlight
+                onPress={selectImage}
+                style={styles.profileuploadicon}
+                underlayColor="#FFFFFF55">
+                <Icon name={'camera'} size={15} color="#222" />
+              </TouchableHighlight>
             </View>
+            <View style={styles.profilebox}>
+              <Text style={styles.username}>{profiledata.name}</Text>
+              <Text style={styles.usertext}>+91 {profiledata.contact}</Text>
+              <Text style={styles.usertext}>{profiledata.email}</Text>
+            </View>
+          </View>
+
+          <View style={{backgroundColor: '#FFF', marginBottom: 7}}>
             {/* <View style={{flexDirection: 'row'}}>
               <View style={styles.paymodeboxicon}>
                 <Image
@@ -151,7 +136,7 @@ const MyaccountScreen = props => {
               </View>
             </View> */}
           </View>
-{/* 
+          {/* 
           <View style={style.bgwhite}>
             <TouchableOpacity
               style={styles.paymodebox}
@@ -239,23 +224,22 @@ const MyaccountScreen = props => {
               </View>
             </TouchableOpacity>
              </View>
- */}
-            <TouchableOpacity
-              style={styles.paymodebox}
-              onPress={() => {
-                signOuts();
-              }}>
-              <View style={styles.paymodeboxicon}>
-                {/* <Image
+  */}
+          <TouchableOpacity
+            style={styles.paymodebox}
+            onPress={() => {
+              signOuts();
+            }}>
+            <View style={styles.paymodeboxicon}>
+              {/* <Image
                   source={require('../../assets/icon/black-logout.png')}
                   style={styles.ImageStyle}
                 /> */}
-              </View>
-              <View style={{flex: 6}}>
-                <Text style={styles.typesize}>Logout</Text>
-              </View>
-            </TouchableOpacity>
-         
+            </View>
+            <View style={{flex: 6}}>
+              <Text style={styles.typesize}>Logout</Text>
+            </View>
+          </TouchableOpacity>
         </ScrollView>
 
         <Bottom props={props}></Bottom>
@@ -266,96 +250,37 @@ const MyaccountScreen = props => {
 
 const styles = StyleSheet.create({
   profile: {
-    marginTop: 20,
-    flexDirection: 'row',
-    flex: 1,
+    marginTop: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   profilebluebox: {
-    width: '100%',
-    flexDirection: 'row',
-    flex: 1,
     padding: 16,
-    paddingBottom: 30,
+    paddingBottom: 20,
+    backgroundColor: '#000',
   },
   profilebox: {
-    flex: 4,
-    paddingLeft: 8,
-  },
-  myname: {
-    fontSize: 20,
-  },
-  paymodebox: {
-    padding: 15,
-    paddingTop: 20,
-    flexDirection: 'row',
-    borderTopColor: '#EEE',
-    borderTopWidth: 1,
-  },
-  paymodeboxicon: {
-    flex: 1,
+    marginTop: 10,
     alignItems: 'center',
-    justifyContent: 'center',
   },
-  typesize: {
+  username: {
+    fontSize: 24,
+    marginBottom: 6,
+    color: '#fff',
+    fontFamily: fontFamilyRegular,
+  },
+  usertext: {
+    marginTop: 3,
     fontSize: 14,
+    color: '#EEE',
     fontFamily: fontFamilyNormal,
   },
-  typesize2: {
-    fontSize: 12,
-    fontFamily: fontFamilyThin,
-    color: '#777',
-  },
-  typesize3: {
-    fontSize: 13,
-    fontFamily: fontFamilyNormal,
-    color: '#222',
-  },
-  ImageStyle: {
-    padding: 5,
-    height: 24,
-    width: '100%',
-    resizeMode: 'contain',
-  },
-  ImageStyle2: {
-    padding: 5,
-    height: 16,
-    width: '100%',
-    resizeMode: 'contain',
-  },
-  kyccard: {
-    backgroundColor: '#E30047BB',
-    padding: 12,
-    flexDirection: 'row',
-  },
-  kycicon: {
-    backgroundColor: '#ff7675',
-    padding: 5,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignContent: 'center',
-    alignItems: 'center',
-    flex: 1,
-  },
-  kyctitle: {
-    color: '#222',
-    fontFamily: fontFamilyNormal,
-    fontSize: 18,
-    color: '#FFF',
-  },
-  kycsubtitle: {
-    color: '#222',
-    fontFamily: fontFamilyNormal,
-    fontSize: 13,
-    color: '#FFF',
+  profileuploadicon: {
+    borderRadius: 50,
+    marginTop: -20,
+    marginLeft: 60,
+    padding: 8,
+    backgroundColor: '#FFFFFFDD',
   },
 });
-// export default MyaccountScreen;
-const mapStateToProps = (state) => {
-  return {
-    state
-  }
-}
-
-export default connect(mapStateToProps,{GET_PROFILE})(MyaccountScreen);
+export default MyaccountScreen;

@@ -8,12 +8,12 @@ import {
   FlatList,
   RefreshControl,
   TouchableOpacity,
+  TextInput,
 } from 'react-native';
-import {Avatar, Button, TextInput, Appbar} from 'react-native-paper';
+import {Avatar, Appbar} from 'react-native-paper';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import IconButton from 'react-native-vector-icons/FontAwesome';
 
-import Bottom from '../navs/Bottom';
 import style from '../../style/style.js';
 
 import io from 'socket.io-client/dist/socket.io';
@@ -27,19 +27,29 @@ const ViewChat = props => {
   const [refreshing, setRefreshing] = useState(false);
   const [chatlist, setChatlist] = useState('');
   const [message, setMessage] = useState('');
+  const [sending, setSending] = useState(false);
+  const [typing, setTyping] = useState(false);
 
   useEffect(() => {
     fetchChatList();
-    console.log('socket', socket)
     socket.on('newmessage', data => {
       console.log('newmessage', data);
       setChatlist(chatlist => [...chatlist, data]);
     });
 
+    socket.on('typing', data => {
+      console.log('typing', data);
+      if (data.touser === '4' && data.typing === true) {
+        typingRunningTimeout()
+      } else {
+        setTimeout(typingTimeout, 3000)
+      }
+    });
+
     var date = new Date().getHours();
     var month = new Date().getMonth() + 1;
     var year = new Date().getFullYear();
-    console.log(date + '-' + month + '-' + year)
+    console.log(date + '-' + month + '-' + year);
   }, []);
 
   // FETCH USER CHAT
@@ -49,59 +59,75 @@ const ViewChat = props => {
     });
   };
 
+  const typingTimeout = () => {
+    setTyping(false);
+  }
+
+  const typingRunningTimeout = () => {
+    setTyping(true);
+  }
+
+  const setMessageType = data => {
+    setMessage(data);
+    if(data.length > 1){
+      var info = {
+        fromuser: '4',
+        touser: userdata.id,
+        typing : true
+      };
+      socket.emit('typing', info);
+    }
+    else {
+      var info = {
+        fromuser: '4',
+        touser: userdata.id,
+        typing : false
+      };
+      socket.emit('typing', info);
+    }
+  };
+
   const sendMsg = () => {
     if (message === '') {
       return;
     }
+    setSending(true);
     sendMessage(userdata.id, message).then(data => {
       var info = {
-        date    : "27-11-2021",
-        doc     : "2021-11-26T19:49:45.000Z",
-        fromuser: "4",
-        id      : '',
-        message : message,
-        status  : 1,
-        time    : "01:19 am",
-        touser  : userdata.id
-      }
-      
-      socket.emit('newmessage', info)
-      setChatlist(chatlist => [info, ...chatlist]);
+        date: '27-11-2021',
+        fromuser: '4',
+        id: '',
+        message: message,
+        status: 1,
+        time: '01:19 am',
+        touser: userdata.id,
+      };
+
+      socket.emit('newmessage', info);
+      setChatlist(chatlist => [...chatlist, info]);
+      setMessage('');
+      setSending(false);
     });
   };
 
   const ItemList = ({item, index}) => {
     return (
-      <View style={{padding: 5}}>
-        {String(item.touser) === String(userdata.id) ? (
-          <View style={{alignItems: 'flex-start'}}>
-            <Text
-              style={{
-                paddingVertical: 10,
-                paddingHorizontal: 15,
-                borderRadius: 30,
-                backgroundColor: '#DDD',
-                color: '#000',
-                fontSize: 16,
-              }}>
-              {item.message}
-            </Text>
-          </View>
-        ) : (
-          <View style={{alignItems: 'flex-end'}}>
-            <Text
-              style={{
-                paddingVertical: 10,
-                paddingHorizontal: 15,
-                borderRadius: 30,
-                backgroundColor: '#E30047',
-                color: '#fff',
-                fontSize: 16,
-              }}>
-              {item.message}
-            </Text>
-          </View>
-        )}
+      <View style={{paddingVertical: 5, paddingHorizontal:15}}>
+        <View
+          style={
+            String(item.touser) === String(userdata.id)
+              ? styles.mychatalign
+              : styles.yourchatalign
+          }>
+          <Text
+            style={
+              String(item.touser) === String(userdata.id)
+                ? styles.mychat
+                : styles.yourchat
+            }>
+            {item.message}
+          </Text>
+        </View>
       </View>
     );
   };
@@ -117,42 +143,54 @@ const ViewChat = props => {
           />
         </Appbar.Header>
 
-        <ScrollView style={{padding: 10}}>
+        {Array.isArray(chatlist) && chatlist.length > 0 ? (
+          <>
           <FlatList
-            style={{marginBottom: 60}}
+            // style={{marginBottom: 20}}
             data={chatlist}
             renderItem={ItemList}
             keyExtractor={(item, index) => index.toString()}
             numColumns={1}
+            vertical="true"
           />
-        </ScrollView>
-        <View
-          style={{
-            position: 'relative',
-            left: 0,
-            right: 0,
-            bottom: 0,
-            // bottomTop: 200,
-          }}>
-          <View style={{flexDirection: 'row', padding:5}}>
-            <View style={{flex: 8}}>
-              <TextInput
-                mode="outlined"
-                placeholder="Message"
-                style={style.inputBox}
-                value={message}
-                onChangeText={setMessage}
-                theme={{colors: {primary: '#000'}}}
-              />
+          {typing === true ? (
+            <View style={styles.typing}>
+              <Text style={styles.typingchat}>Typing...</Text>
             </View>
-            <View style={{flex: 2, alignItems: 'center', alignSelf: 'center'}}>
-              {/* <Button
-                mode="contained"
-                style={style.roundbtn}
-                onPress={sendMsg}> */}
-                  
-                <IconButton onPress={sendMsg} name={'telegram'} size={40} color="#000" />
-              {/* </Button> */}
+          ) : null}
+        </>
+          ) : (
+            <ScrollView>
+              {/* <Text> No Data </Text> */}
+            </ScrollView>
+          )}
+        
+        <View style={{position: 'relative', left: 0, right: 0, bottom: 0}}>
+          <View
+            style={{
+              paddingVertical: 5,
+              paddingHorizontal: 10,
+            }}>
+            <TextInput
+              mode="outlined"
+              multiline={true}
+              placeholder="Message"
+              style={styles.inputBox}
+              value={message}
+              onChangeText={setMessageType}
+              theme={{colors: {primary: '#000'}}}
+            />
+            <View style={styles.floatbtn}>
+              {sending === true ? (
+                <IconButton name={'telegram'} size={40} color="red" />
+              ) : (
+                <IconButton
+                  onPress={sendMsg}
+                  name={'telegram'}
+                  size={40}
+                  color="#000"
+                />
+              )}
             </View>
           </View>
         </View>
@@ -161,6 +199,60 @@ const ViewChat = props => {
   );
 };
 
-var styles = StyleSheet.create({});
+var styles = StyleSheet.create({
+  inputBox: {
+    borderWidth: 1,
+    padding: 10,
+    paddingRight: 30,
+    borderRadius: 50,
+    borderColor: 'transparent',
+    backgroundColor: '#EDEDED',
+    color: '#000',
+    width: '100%',
+  },
+  floatbtn: {
+    alignItems: 'flex-end',
+    position: 'absolute',
+    zIndex: 99,
+    alignSelf: 'flex-end',
+    alignContent: 'flex-end',
+    right: 15,
+    top: 10,
+  },
+  mychat: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 30,
+    backgroundColor: '#E30047',
+    color: '#fff',
+    fontSize: 16,
+    maxWidth: '80%',
+  },
+  yourchat: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 30,
+    backgroundColor: '#DDD',
+    color: '#000',
+    fontSize: 16,
+    maxWidth: '80%',
+  },
+  mychatalign: {alignItems: 'flex-end'},
+  yourchatalign: {
+    alignItems: 'flex-start',
+  },
+  typing: {
+    alignItems: 'flex-start',
+    marginBottom: 20,
+  },
+  typingchat: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 30,
+    backgroundColor: '#DDD',
+    color: '#000',
+    fontSize: 16,
+  },
+});
 
 export default ViewChat;
