@@ -1,39 +1,16 @@
 import React, {useEffect, useState} from 'react';
-import {View, TouchableOpacity, Image, StyleSheet} from 'react-native';
+import {View, TouchableOpacity, StyleSheet} from 'react-native';
 import {Text} from 'react-native-paper';
 import {fontFamilyNormal} from '../../constant/fonts';
 import Icon from 'react-native-vector-icons/FontAwesome';
-// import DeviceInfo from 'react-native-device-info';
 
 const Bottom = ({props}) => {
   const RedirectModule = async link => {
     await props.navigation.navigate(link);
   };
 
-  const [battery, setBattery] = useState('');
-
-  useEffect(() => {
-    DeviceIn();
-  }, []);
-
-  const DeviceIn = () => {
-  //   DeviceInfo.getBatteryLevel().then(batteryLevel => {
-  //     setBattery(parseFloat(batteryLevel) * 100);
-  //   });
-  };
   return (
     <>
-      {/* {battery < 15 ? (
-        <View style={styles.batterycard}>
-          <View style={styles.batteryicon}>
-            <Icon name="info" size={20} color="#FFF" />
-          </View>
-          <View style={{flex:8, paddingHorizontal:10}}>
-            <Text style={styles.batterytitle}>Battery is low</Text>
-            <Text style={styles.batterysubtitle}>Charge your phone to atleast 15% to go online</Text>
-          </View>
-        </View>
-      ) : null} */}
       <View
         style={{
           position: 'relative',
@@ -47,33 +24,21 @@ const Bottom = ({props}) => {
           <TouchableOpacity
             onPress={e => RedirectModule('Home')}
             style={styles.bottombtn}>
-            <Image
-              source={require('../../assets/image/icon2.png')}
-              resizeMode={'contain'}
-              style={styles.icons}
-            />
+            <Icon name={'comments'} size={22} color="#000" />
             <Text style={styles.footertext}>Chat</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={e => RedirectModule('Contact')}
             style={styles.bottombtn}>
-            <Image
-              source={require('../../assets/image/icon2.png')}
-              resizeMode={'contain'}
-              style={styles.icons}
-            />
+            <Icon name={'address-book'} size={22} color="#000" />
             <Text style={styles.footertext}>Contact</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={e => RedirectModule('MyaccountScreen')}
             style={styles.bottombtn}>
-            <Image
-              source={require('../../assets/image/icon2.png')}
-              resizeMode={'contain'}
-              style={styles.icons}
-            />
+            <Icon name={'user'} size={22} color="#000" />
             <Text style={styles.footertext}>Profile</Text>
           </TouchableOpacity>
 

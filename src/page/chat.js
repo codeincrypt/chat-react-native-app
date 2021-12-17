@@ -18,44 +18,54 @@ import style from '../../style/style.js';
 
 import io from 'socket.io-client/dist/socket.io';
 import {WEBSOCKET} from '../../constant/config';
-import {GET_CHATVIEW, sendMessage} from '../redux/actions/request';
+import {GET_CHATVIEW, sendMessage, getProfile} from '../redux/actions/request';
 const socket = io(WEBSOCKET, {transports: ['websocket']}, {jsonp: false});
 
 const ViewChat = props => {
   const userdata = props.route.params.item;
+  const myid = props.route.params.id;
   const [loading, setIsloading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [chatlist, setChatlist] = useState('');
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [typing, setTyping] = useState(false);
+  const [profiledata, setProfile] = useState('');
+
+  var date = new Date('DD').getHours();
+  var month = new Date('MMM').getMonth() + 1;
+  var year = new Date('YYYY').getFullYear();
+  var newdate = `${date} ${month} ${year}`
 
   useEffect(() => {
     fetchChatList();
+    fetchProfile();
     socket.on('newmessage', data => {
-      console.log('newmessage', data);
-      setChatlist(chatlist => [...chatlist, data]);
+      if(parseInt(myid) === parseInt(data.touser) && parseInt(userdata.id) === parseInt(data.fromuser)){
+        setChatlist(chatlist => [data, ...chatlist]);
+      }
+      setTyping(false);
     });
-
     socket.on('typing', data => {
-      console.log('typing', data);
-      if (data.touser === '4' && data.typing === true) {
+      if (parseInt(data.touser) === parseInt(myid) && data.typing === true) {
         typingRunningTimeout()
       } else {
         setTimeout(typingTimeout, 3000)
       }
     });
-
-    var date = new Date().getHours();
-    var month = new Date().getMonth() + 1;
-    var year = new Date().getFullYear();
-    console.log(date + '-' + month + '-' + year);
+    console.log('socket', newdate)
   }, []);
 
   // FETCH USER CHAT
   const fetchChatList = () => {
     GET_CHATVIEW(userdata.id).then(data => {
       setChatlist(data.message);
+    });
+  };
+
+  const fetchProfile = () => {
+    getProfile().then(data => {
+      setProfile(data);
     });
   };
 
@@ -94,7 +104,7 @@ const ViewChat = props => {
     setSending(true);
     sendMessage(userdata.id, message).then(data => {
       var info = {
-        date: '27-11-2021',
+        date: newdate,
         fromuser: '4',
         id: '',
         message: message,
@@ -103,8 +113,8 @@ const ViewChat = props => {
         touser: userdata.id,
       };
 
-      socket.emit('newmessage', info);
-      setChatlist(chatlist => [...chatlist, info]);
+      socket.emit('sendmessage', info);
+      setChatlist(chatlist => [info, ...chatlist]);
       setMessage('');
       setSending(false);
     });
@@ -115,13 +125,13 @@ const ViewChat = props => {
       <View style={{paddingVertical: 5, paddingHorizontal:15}}>
         <View
           style={
-            String(item.touser) === String(userdata.id)
+            parseInt(item.touser) === parseInt(userdata.id)
               ? styles.mychatalign
               : styles.yourchatalign
           }>
           <Text
             style={
-              String(item.touser) === String(userdata.id)
+              parseInt(item.touser) === parseInt(userdata.id)
                 ? styles.mychat
                 : styles.yourchat
             }>
@@ -151,7 +161,7 @@ const ViewChat = props => {
             renderItem={ItemList}
             keyExtractor={(item, index) => index.toString()}
             numColumns={1}
-            vertical="true"
+            inverted
           />
           {typing === true ? (
             <View style={styles.typing}>
@@ -177,6 +187,7 @@ const ViewChat = props => {
               placeholder="Message"
               style={styles.inputBox}
               value={message}
+              placeholderTextColor = "#AAA"
               onChangeText={setMessageType}
               theme={{colors: {primary: '#000'}}}
             />
@@ -203,7 +214,8 @@ var styles = StyleSheet.create({
   inputBox: {
     borderWidth: 1,
     padding: 10,
-    paddingRight: 30,
+    paddingRight: 40,
+    paddingLeft: 20,
     borderRadius: 50,
     borderColor: 'transparent',
     backgroundColor: '#EDEDED',
@@ -223,8 +235,8 @@ var styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 30,
-    backgroundColor: '#E30047',
-    color: '#fff',
+    backgroundColor: '#079992',
+    color: '#FFF',
     fontSize: 16,
     maxWidth: '80%',
   },
@@ -244,6 +256,7 @@ var styles = StyleSheet.create({
   typing: {
     alignItems: 'flex-start',
     marginBottom: 20,
+    paddingLeft:15,
   },
   typingchat: {
     paddingVertical: 10,

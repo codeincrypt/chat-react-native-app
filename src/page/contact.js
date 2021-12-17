@@ -28,13 +28,14 @@ const ContactList = props => {
   }, []);
 
   const loadContacts = () => {
-    props.GET_CONTACT(
-      data => {
+    props.GET_CONTACT(data => {
         var sortedObjs = _.sortBy(data, 'displayName');
         setNumber(sortedObjs);
-        console.log(sortedObjs);
-      },
-      e => console.log({e}),
+        // console.log('sortedObjs.length', sortedObjs.length);
+        // for(let i=50;i<100;i++) {
+        //   console.log('sortedObjs', sortedObjs[i].displayName, sortedObjs[i].phoneNumbers[0].number);
+        // }
+      }, e => console.log({e}),
     );
     // Contacts.getAll().then(contacts => {
     //   var sortedObjs = _.sortBy(contacts, 'displayName');
@@ -79,7 +80,7 @@ const ContactList = props => {
       <SafeAreaView style={style.body}>
         <Appbar.Header style={style.header}>
           <Appbar.BackAction onPress={() => props.navigation.goBack()} />
-          <Appbar.Content title="Contact" titleStyle={style.headertitle} />
+          <Appbar.Content title={'Select Contact'}  subtitle={`${number.length} Contacts`} titleStyle={style.contactheadertitle} />
         </Appbar.Header>
         <ScrollView>
           <View style={style.tbody}>
@@ -88,10 +89,10 @@ const ContactList = props => {
           <View style={style.tbody}>
             {Array.isArray(number) && number.length ? (
               number.map((item, index) => {
-                let cont;
-                let displayCon;
+                var cont;
+                var displayCon;
                 if (item.phoneNumbers.length > 0) {
-                  {
+                  // {
                     return item.phoneNumbers.map(itemNumber => {
                       cont = itemNumber.number;
                       cont = cont.replace(/ +/g, '');
@@ -100,7 +101,6 @@ const ContactList = props => {
                         cont.length === 10
                       ) {
                         displayCon = cont.substr(cont.length - 10, 10);
-                        // console.log('here', displayCon)
                         return (
                           <TouchableOpacity
                             key={itemNumber.id}
@@ -148,7 +148,7 @@ const ContactList = props => {
                                 <Text style={style.contactname}>
                                   {item.displayName}
                                 </Text>
-                                {/* <Text style={style.contactnumber}>{displayCon}</Text> */}
+                                <Text style={style.contactnumber}>{displayCon}</Text>
                                 <Text style={style.contactnumber}>
                                   Invite Now
                                 </Text>
@@ -158,7 +158,7 @@ const ContactList = props => {
                         );
                       }
                     });
-                  }
+                  // }
                 }
               })
             ) : (
@@ -174,7 +174,6 @@ const ContactList = props => {
 const styles = StyleSheet.create({});
 // export default ContactList;
 const mapStateToProps = state => {
-  console.log('GET_CONTACT', JSON.stringify(state, null, 2));
   return {
     state,
   };

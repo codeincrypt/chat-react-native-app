@@ -31,6 +31,11 @@ export default StyleSheet.create({
     alignSelf: 'center',
     color: '#FFF',
   },
+  contactheadertitle: {
+    fontSize: 19,
+    fontWeight: '300',
+    color: '#FFF',
+  },
   title: {
     fontSize: 18,
     fontWeight: '300',
@@ -61,7 +66,7 @@ export default StyleSheet.create({
     marginRight: 10,
   },
   listbody: {
-    flex: 5,
+    flex: 8,
     paddingLeft: 12,
   },
   listicon: {

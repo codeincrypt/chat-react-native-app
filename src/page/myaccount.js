@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext} from 'react';
-import {Avatar, Appbar} from 'react-native-paper';
+import {Avatar, Appbar, List} from 'react-native-paper';
 import {
   View,
   Text,
@@ -16,7 +16,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import ImagePicker from 'react-native-image-crop-picker';
 
 import {connect} from 'react-redux';
-import {GET_PROFILE, GET_CHATLIST, getProfile} from '../redux/actions/request';
+import {GET_PROFILE, GET_CHATLIST, getProfile, uploadProfilePicture} from '../redux/actions/request';
 
 import Bottom from '../navs/Bottom';
 import {
@@ -66,6 +66,10 @@ const MyaccountScreen = props => {
     });
   };
 
+  const changeProfilePhoto = (image) => {
+    uploadProfilePicture(image)
+  }
+
   useEffect(() => {
     fetchProfile();
   }, []);
@@ -86,158 +90,85 @@ const MyaccountScreen = props => {
             <View style={styles.profile}>
               <Avatar.Image
                 style={{
-                  backgroundColor: '#fff',
+                  backgroundColor: '#FFF',
                 }}
                 source={{
                   uri: profileimg,
                 }}
-                size={120}
+                size={160}
               />
               <TouchableHighlight
                 onPress={selectImage}
                 style={styles.profileuploadicon}
                 underlayColor="#FFFFFF55">
-                <Icon name={'camera'} size={15} color="#222" />
+                <Icon name={'camera'} size={18} color="#FFF" />
               </TouchableHighlight>
             </View>
-            <View style={styles.profilebox}>
-              <Text style={styles.username}>{profiledata.name}</Text>
-              <Text style={styles.usertext}>+91 {profiledata.contact}</Text>
-              <Text style={styles.usertext}>{profiledata.email}</Text>
+          </View>
+
+          <View style={styles.lists}>
+            <View style={{flexDirection: 'row'}}>
+              <View style={styles.paymodeboxicon}>
+                <Icon name={'user'} size={26} color="#333" />
+              </View>
+              <View style={{flex: 6}}>
+                <Text style={styles.title1}>Name</Text>
+                <Text style={styles.title2}>{profiledata.name}</Text>
+              </View>
             </View>
           </View>
 
-          <View style={{backgroundColor: '#FFF', marginBottom: 7}}>
-            {/* <View style={{flexDirection: 'row'}}>
+          <View style={styles.lists}>
+            <View style={{flexDirection: 'row'}}>
               <View style={styles.paymodeboxicon}>
-                <Image
-                  source={require('../../../assets/icon/mobile-black.png')}
-                  style={styles.ImageStyle2}
-                />
+                <Icon name={'info-circle'} size={26} color="#333" />
               </View>
               <View style={{flex: 6}}>
-                <Text style={styles.typesize3}>
-                  Phone : {profiledata.contact}
-                </Text>
+                <Text style={styles.title1}>About</Text>
+                <Text style={styles.title2}>{profiledata.status}</Text>
               </View>
-            </View> */}
-            {/* <View
-              style={{flexDirection: 'row', marginTop: 7, marginBottom: 20}}>
-              <View style={styles.paymodeboxicon}>
-                <Image
-                  source={require('../../../assets/icon/map-black.png')}
-                  style={styles.ImageStyle2}
-                />
+              <View style={styles.paymodeboxicon2}>
+                <Icon name={'pencil'} size={18} color="#333" />
               </View>
-              <View style={{flex: 6}}>
-                <Text style={styles.typesize3}>
-                  Locality : {profiledata.address}
-                </Text>
-              </View>
-            </View> */}
+            </View>
           </View>
-          {/* 
-          <View style={style.bgwhite}>
-            <TouchableOpacity
-              style={styles.paymodebox}
-              onPress={() =>
-                props.navigation.navigate('Myprofile', {token: token})
-              }>
-              <View style={styles.paymodeboxicon}>
-                <Image
-                  source={require('../../../assets/icon/black-profile.png')}
-                  style={styles.ImageStyle}
-                />
-              </View>
-              <View style={{flex: 6}}>
-                <Text style={styles.typesize}>Profile Detail</Text>
-              </View>
-            </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.paymodebox}
-              onPress={() => props.navigation.navigate('Myorder')}>
+          <View style={styles.lists}>
+            <View style={{flexDirection: 'row'}}>
               <View style={styles.paymodeboxicon}>
-                <Image
-                  source={require('../../../assets/icon/black-order.png')}
-                  style={styles.ImageStyle}
-                />
+                <Icon name={'phone'} size={26} color="#333" />
               </View>
               <View style={{flex: 6}}>
-                <Text style={styles.typesize}>Orders</Text>
+                <Text style={styles.title1}>Phone</Text>
+                <Text style={styles.title2}>+91 {profiledata.contact}</Text>
               </View>
-            </TouchableOpacity>
+            </View>
+          </View>
 
-            <TouchableOpacity
-              style={styles.paymodebox}
-              onPress={() =>
-                props.navigation.navigate('Review', {token: token})
-              }>
+          <View style={styles.lists}>
+            <View style={{flexDirection: 'row'}}>
               <View style={styles.paymodeboxicon}>
-                <Image
-                  source={require('../../../assets/icon/review-comment.png')}
-                  style={styles.ImageStyle}
-                />
+                <Icon name={'envelope'} size={23} color="#333" />
               </View>
               <View style={{flex: 6}}>
-                <Text style={styles.typesize}>Review & Comments</Text>
+                <Text style={styles.title1}>Email</Text>
+                <Text style={styles.title2}>{profiledata.email}</Text>
               </View>
-            </TouchableOpacity>
+            </View>
+          </View>
 
-            <TouchableOpacity
-              style={styles.paymodebox}
-              onPress={() =>
-                props.navigation.navigate('Password', {token: token})
-              }>
-              <View style={styles.paymodeboxicon}>
-                <Image
-                  source={require('../../../assets/icon/black-password.png')}
-                  style={styles.ImageStyle}
-                />
-              </View>
-              <View style={{flex: 6}}>
-                <Text style={styles.typesize}>Password Setting</Text>
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.paymodebox}>
-              <View style={styles.paymodeboxicon}>
-                <Image
-                  source={require('../../../assets/icon/black-help.png')}
-                  style={styles.ImageStyle}
-                />
-              </View>
-              <View style={{flex: 6}}>
-                <Text style={styles.typesize}>Help</Text>
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.paymodebox}>
-              <View style={styles.paymodeboxicon}>
-                <Image
-                  source={require('../../../assets/icon/black-faq.png')}
-                  style={styles.ImageStyle}
-                />
-              </View>
-              <View style={{flex: 6}}>
-                <Text style={styles.typesize}>FAQ</Text>
-              </View>
-            </TouchableOpacity>
-             </View>
-  */}
           <TouchableOpacity
-            style={styles.paymodebox}
+            style={styles.lists}
             onPress={() => {
               signOuts();
             }}>
-            <View style={styles.paymodeboxicon}>
-              {/* <Image
-                  source={require('../../assets/icon/black-logout.png')}
-                  style={styles.ImageStyle}
-                /> */}
-            </View>
-            <View style={{flex: 6}}>
-              <Text style={styles.typesize}>Logout</Text>
+            <View style={{flexDirection: 'row'}}>
+              <View style={styles.paymodeboxicon}>
+                <Icon name={'sign-in'} size={26} color="#333" />
+              </View>
+              <View style={{flex: 6}}>
+                <Text style={styles.logout}>Logout</Text>
+              </View>
             </View>
           </TouchableOpacity>
         </ScrollView>
@@ -257,7 +188,7 @@ const styles = StyleSheet.create({
   profilebluebox: {
     padding: 16,
     paddingBottom: 20,
-    backgroundColor: '#000',
+    backgroundColor: '#FFF',
   },
   profilebox: {
     marginTop: 10,
@@ -266,21 +197,53 @@ const styles = StyleSheet.create({
   username: {
     fontSize: 24,
     marginBottom: 6,
-    color: '#fff',
+    color: '#000',
     fontFamily: fontFamilyRegular,
   },
   usertext: {
     marginTop: 3,
     fontSize: 14,
-    color: '#EEE',
+    color: '#000',
     fontFamily: fontFamilyNormal,
   },
   profileuploadicon: {
     borderRadius: 50,
-    marginTop: -20,
-    marginLeft: 60,
+    marginTop: -40,
+    marginLeft: 110,
+    padding: 15,
+    backgroundColor: '#000',
+  },
+  paymodeboxicon: {
+    padding: 12,
+    paddingRight: 20,
+  },
+  paymodeboxicon2: {
     padding: 8,
-    backgroundColor: '#FFFFFFDD',
+    paddingRight: 20,
+  },
+  title1: {
+    color: '#000',
+    fontSize: 14,
+    paddingTop: 2,
+    paddingLeft: 10,
+  },
+  title2: {
+    color: '#000',
+    fontSize: 18,
+    paddingTop: 2,
+    paddingLeft: 10,
+  },
+  logout: {
+    color: '#000',
+    fontSize: 18,
+    paddingTop: 14,
+    paddingLeft: 10,
+  },
+  lists: {
+    backgroundColor: '#FFF',
+    marginBottom: 5,
+    paddingTop: 15,
+    paddingHorizontal: 20,
   },
 });
 export default MyaccountScreen;

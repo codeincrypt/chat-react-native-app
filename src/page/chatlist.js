@@ -36,6 +36,9 @@ const ChatList = props => {
   useEffect(() => {
     fetchChatList();
     fetchProfile();
+    props.navigation.addListener('focus', () => {
+      fetchChatList();
+    });
   }, []);
 
   const wait = timeout => {
@@ -53,7 +56,7 @@ const ChatList = props => {
     return (
       <ChatCompList
         item={item}
-        onPress={() => props.navigation.navigate('Chat', {item: item})}
+        onPress={() => props.navigation.navigate('Chat', {item: item, id:profile.id})}
       />
     );
   };

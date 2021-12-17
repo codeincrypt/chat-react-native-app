@@ -69,13 +69,35 @@ export const getProfile = async () => {
     }
   });
   const data = await response.json();
-  console.log('data', data);
   return data;
 };
 
+
+export const uploadProfilePicture = async (image) => {
+  const token = await AsyncStorage.getItem('thelvchatapp');
+  var filesname = image.path.substring(image.path);
+  const data = new FormData();
+    data.append('photo', {
+      uri: image.path,
+      type: image.mime,
+      name: filesname,
+    });
+    const response = await fetch(`${URL_STRING}/user/profile-photo`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Accept: 'application/json',
+        apikey: API_KEY,
+        Authorization: 'Bearer ' + token,
+      },
+      body: data,
+    });
+    const newdata = await response.json();
+    return newdata;
+}
+
 export const getChatList = async () => {
   const token = await AsyncStorage.getItem('thelvchatapp');
-  console.log('token', token);
   const response = await fetch(`${URL_STRING}/user/userList`, {
     method:'GET',
     headers : {
