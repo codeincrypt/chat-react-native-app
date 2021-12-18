@@ -15,15 +15,12 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import ImagePicker from 'react-native-image-crop-picker';
 
-import {connect} from 'react-redux';
-import {GET_PROFILE, GET_CHATLIST, getProfile, uploadProfilePicture} from '../redux/actions/request';
+import {getProfile, uploadProfilePicture, getStatusList} from '../redux/actions/request';
 
 import Bottom from '../navs/Bottom';
 import {
-  fontFamilyThin,
   fontFamilyNormal,
   fontFamilyRegular,
-  fontFamilyBold,
 } from '../../constant/fonts';
 import style from '../../style/style.js';
 
@@ -31,10 +28,9 @@ const MyaccountScreen = props => {
   const {signOut} = useContext(UserContext);
   const [loading, setIsloading] = useState(true);
 
+  const [statuslist, setStatusList] = useState('');
   const [profiledata, setProfile] = useState('');
-  const [profileimg, setProfileimg] = useState(
-    'https://chatapi.lvkart.com/default/default-user.png',
-  );
+  const [profileimg, setProfileimg] = useState('https://chatapi.lvkart.com/default/default-user.png');
 
   // props.GET_PROFILE((data) => {
   //   console.log('GET_PROFILE', data)
@@ -70,8 +66,17 @@ const MyaccountScreen = props => {
     uploadProfilePicture(image)
   }
 
+  const StatusList = () => {
+    getStatusList().then((result) => {
+      setStatusList(result)
+    })
+  }
+
   useEffect(() => {
-    fetchProfile();
+    StatusList();
+    props.navigation.addListener('focus', () => {
+      fetchProfile();
+    });
   }, []);
 
   if (loading) {
@@ -127,9 +132,10 @@ const MyaccountScreen = props => {
                 <Text style={styles.title1}>About</Text>
                 <Text style={styles.title2}>{profiledata.status}</Text>
               </View>
-              <View style={styles.paymodeboxicon2}>
+              <TouchableOpacity style={styles.paymodeboxicon2}
+                onPress={() => props.navigation.navigate('MyStatus', {profile: profiledata, statuslist:statuslist})}>
                 <Icon name={'pencil'} size={18} color="#333" />
-              </View>
+              </TouchableOpacity>
             </View>
           </View>
 

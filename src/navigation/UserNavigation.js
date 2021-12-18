@@ -10,6 +10,7 @@ import ChatList from '../page/chatlist';
 import ContactList from '../page/contact';
 import MyaccountScreen from '../page/myaccount';
 import ViewChat from '../page/chat';
+import MyStatusScreen from '../page/changeStatus';
 
 const HomeStack = createStackNavigator();
 const ProfileStack = createStackNavigator();
@@ -90,6 +91,13 @@ const createProfileStack = ({navigation}) => {
       <ProfileStack.Screen
         name="Myaccount"
         component={MyaccountScreen}
+        options={{
+          headerShown:false
+        }}
+      />
+      <ProfileStack.Screen
+        name="MyStatus"
+        component={MyStatusScreen}
         options={{
           headerShown:false
         }}

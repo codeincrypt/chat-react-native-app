@@ -82,7 +82,7 @@ export const uploadProfilePicture = async (image) => {
       type: image.mime,
       name: filesname,
     });
-    const response = await fetch(`${URL_STRING}/user/profile-photo`, {
+    const response = await fetch(`${URL_STRING}/user/updatePhoto`, {
       method: 'POST',
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -95,6 +95,20 @@ export const uploadProfilePicture = async (image) => {
     const newdata = await response.json();
     return newdata;
 }
+
+export const getStatusList = async () => {
+  const token = await AsyncStorage.getItem('thelvchatapp');
+  const response = await fetch(`${URL_STRING}/user/statusList`, {
+    method:'GET',
+    headers : {
+      'Content-type': 'application/json',
+      apikey: API_KEY,
+      Authorization: 'Bearer ' + token,
+    }
+  });
+  const data = await response.json();
+  return data;
+};
 
 export const getChatList = async () => {
   const token = await AsyncStorage.getItem('thelvchatapp');
@@ -121,6 +135,23 @@ export const sendMessage = async (userid, message) => {
     },
     body: JSON.stringify({
       userid, message
+    }),
+  });
+  const data = await response.json();
+  return data;
+};
+
+export const getUpdateStatus = async (mystatus) => {
+  const token = await AsyncStorage.getItem('thelvchatapp');
+  const response = await fetch(`${URL_STRING}/user/updateStatus`, {
+    method:'POST',
+    headers : {
+      'Content-type': 'application/json',
+      apikey: API_KEY,
+      Authorization: 'Bearer ' + token,
+    },
+    body: JSON.stringify({
+      mystatus
     }),
   });
   const data = await response.json();

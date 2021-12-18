@@ -28,19 +28,12 @@ const ContactList = props => {
   }, []);
 
   const loadContacts = () => {
-    props.GET_CONTACT(data => {
-        var sortedObjs = _.sortBy(data, 'displayName');
-        setNumber(sortedObjs);
-        // console.log('sortedObjs.length', sortedObjs.length);
-        // for(let i=50;i<100;i++) {
-        //   console.log('sortedObjs', sortedObjs[i].displayName, sortedObjs[i].phoneNumbers[0].number);
-        // }
-      }, e => console.log({e}),
-    );
-    // Contacts.getAll().then(contacts => {
-    //   var sortedObjs = _.sortBy(contacts, 'displayName');
-    //     setNumber(sortedObjs)
-    // })
+      // props.GET_CONTACT(data => {
+      //   Contacts.getAll().then(contacts => {
+      //     var sortedObjs = _.sortBy(contacts, 'displayName');
+      //     setNumber(sortedObjs)
+      //   })
+      // })
   };
 
   const search = text => {

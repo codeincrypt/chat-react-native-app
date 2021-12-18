@@ -8,11 +8,13 @@ import {
   FlatList,
   RefreshControl,
   TouchableOpacity,
+  TouchableHighlight,
   TextInput,
 } from 'react-native';
 import {Avatar, Appbar} from 'react-native-paper';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import IconButton from 'react-native-vector-icons/FontAwesome';
+import moment from 'moment';
 
 import style from '../../style/style.js';
 
@@ -32,28 +34,25 @@ const ViewChat = props => {
   const [typing, setTyping] = useState(false);
   const [profiledata, setProfile] = useState('');
 
-  var date = new Date('DD').getHours();
-  var month = new Date('MMM').getMonth() + 1;
-  var year = new Date('YYYY').getFullYear();
-  var newdate = `${date} ${month} ${year}`
-
   useEffect(() => {
     fetchChatList();
     fetchProfile();
     socket.on('newmessage', data => {
-      if(parseInt(myid) === parseInt(data.touser) && parseInt(userdata.id) === parseInt(data.fromuser)){
+      if (
+        parseInt(myid) === parseInt(data.touser) &&
+        parseInt(userdata.id) === parseInt(data.fromuser)
+      ) {
         setChatlist(chatlist => [data, ...chatlist]);
       }
       setTyping(false);
     });
     socket.on('typing', data => {
       if (parseInt(data.touser) === parseInt(myid) && data.typing === true) {
-        typingRunningTimeout()
+        typingRunningTimeout();
       } else {
-        setTimeout(typingTimeout, 3000)
+        setTimeout(typingTimeout, 3000);
       }
     });
-    console.log('socket', newdate)
   }, []);
 
   // FETCH USER CHAT
@@ -71,45 +70,46 @@ const ViewChat = props => {
 
   const typingTimeout = () => {
     setTyping(false);
-  }
+  };
 
   const typingRunningTimeout = () => {
     setTyping(true);
-  }
+  };
 
   const setMessageType = data => {
     setMessage(data);
-    if(data.length > 1){
+    if (data.length > 1) {
       var info = {
         fromuser: '4',
         touser: userdata.id,
-        typing : true
+        typing: true,
       };
       socket.emit('typing', info);
-    }
-    else {
+    } else {
       var info = {
         fromuser: '4',
         touser: userdata.id,
-        typing : false
+        typing: false,
       };
       socket.emit('typing', info);
     }
   };
 
   const sendMsg = () => {
+    const currentdate = moment().format('DD MMM YYYY');
+    const currenttime = moment().format('hh:mm A');
     if (message === '') {
       return;
     }
     setSending(true);
     sendMessage(userdata.id, message).then(data => {
       var info = {
-        date: newdate,
-        fromuser: '4',
-        id: '',
+        date: currentdate,
+        fromuser: myid,
+        id: 1,
         message: message,
         status: 1,
-        time: '01:19 am',
+        time: currenttime,
         touser: userdata.id,
       };
 
@@ -122,22 +122,49 @@ const ViewChat = props => {
 
   const ItemList = ({item, index}) => {
     return (
-      <View style={{paddingVertical: 5, paddingHorizontal:15}}>
-        <View
+      <View style={{paddingVertical: 5, paddingHorizontal: 15}}>
+        {/* <View style={{alignItems: 'center', padding: 10}}>
+          <Text
+            style={{
+              fontSize: 11,
+              color: '#000',
+              backgroundColor: '#EEE',
+              borderRadius: 20,
+              paddingHorizontal: 25,
+              paddingVertical: 4,
+            }}>
+            {item.date}
+          </Text>
+        </View> */}
+        <TouchableHighlight 
+        onPress={() => console.log('short-press', item.id)}
+        onLongPress={() => console.log('long-press', item.id)}
           style={
             parseInt(item.touser) === parseInt(userdata.id)
               ? styles.mychatalign
               : styles.yourchatalign
           }>
-          <Text
+          <View
             style={
               parseInt(item.touser) === parseInt(userdata.id)
                 ? styles.mychat
                 : styles.yourchat
             }>
-            {item.message}
-          </Text>
-        </View>
+            <Text style={
+                parseInt(item.touser) === parseInt(userdata.id)
+                  ? styles.mychatmessage
+                  : styles.yourchatmessage
+              }>{item.message}</Text>
+            <Text
+              style={
+                parseInt(item.touser) === parseInt(userdata.id)
+                  ? styles.mychattime
+                  : styles.yourchattime
+              }>
+              {item.time}
+            </Text>
+          </View>
+        </TouchableHighlight>
       </View>
     );
   };
@@ -155,26 +182,24 @@ const ViewChat = props => {
 
         {Array.isArray(chatlist) && chatlist.length > 0 ? (
           <>
-          <FlatList
-            // style={{marginBottom: 20}}
-            data={chatlist}
-            renderItem={ItemList}
-            keyExtractor={(item, index) => index.toString()}
-            numColumns={1}
-            inverted
-          />
-          {typing === true ? (
-            <View style={styles.typing}>
-              <Text style={styles.typingchat}>Typing...</Text>
-            </View>
-          ) : null}
-        </>
-          ) : (
-            <ScrollView>
-              {/* <Text> No Data </Text> */}
-            </ScrollView>
-          )}
-        
+            <FlatList
+              // style={{marginBottom: 20}}
+              data={chatlist}
+              renderItem={ItemList}
+              keyExtractor={(item, index) => index.toString()}
+              numColumns={1}
+              inverted
+            />
+            {typing === true ? (
+              <View style={styles.typing}>
+                <Text style={styles.typingchat}>Typing...</Text>
+              </View>
+            ) : null}
+          </>
+        ) : (
+          <ScrollView>{/* <Text> No Data </Text> */}</ScrollView>
+        )}
+
         <View style={{position: 'relative', left: 0, right: 0, bottom: 0}}>
           <View
             style={{
@@ -187,7 +212,7 @@ const ViewChat = props => {
               placeholder="Message"
               style={styles.inputBox}
               value={message}
-              placeholderTextColor = "#AAA"
+              placeholderTextColor="#AAA"
               onChangeText={setMessageType}
               theme={{colors: {primary: '#000'}}}
             />
@@ -234,7 +259,7 @@ var styles = StyleSheet.create({
   mychat: {
     paddingVertical: 10,
     paddingHorizontal: 15,
-    borderRadius: 30,
+    borderRadius: 15,
     backgroundColor: '#079992',
     color: '#FFF',
     fontSize: 16,
@@ -243,11 +268,35 @@ var styles = StyleSheet.create({
   yourchat: {
     paddingVertical: 10,
     paddingHorizontal: 15,
-    borderRadius: 30,
+    borderRadius: 15,
     backgroundColor: '#DDD',
     color: '#000',
     fontSize: 16,
     maxWidth: '80%',
+  },
+  mychattime: {
+    color: '#FFF',
+    fontSize: 10,
+    marginTop: 5,
+    marginBottom: -5,
+    alignSelf:'flex-end'
+  },
+  yourchattime: {
+    color: '#000',
+    fontSize: 10,
+    marginTop: 5,
+    marginBottom: -5,
+    alignSelf:'flex-end'
+  },
+  mychatmessage: {
+    color: '#FFF',
+    fontSize: 16,
+    // alignItems: 'flex-end'
+  },
+  yourchatmessage: {
+    color: '#000',
+    fontSize: 16,
+    // alignItems: 'flex-end'
   },
   mychatalign: {alignItems: 'flex-end'},
   yourchatalign: {
@@ -256,7 +305,7 @@ var styles = StyleSheet.create({
   typing: {
     alignItems: 'flex-start',
     marginBottom: 20,
-    paddingLeft:15,
+    paddingLeft: 15,
   },
   typingchat: {
     paddingVertical: 10,

@@ -4,18 +4,22 @@ import {
   Text,
   StyleSheet,
   Alert,
-  ActivityIndicator,
+  ToastAndroid,
   Image,
   TouchableOpacity,
   Modal,
-  ToastAndroid,
   ScrollView,
 } from 'react-native';
-import {TextInput, Button, Snackbar, Appbar} from 'react-native-paper';
+import {TextInput, Button, Appbar} from 'react-native-paper';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import RBSheet from 'react-native-raw-bottom-sheet';
 import Toast from 'react-native-fast-toast';
-import {PERMISSIONS, requestMultiple, checkMultiple} from 'react-native-permissions';
+import {
+  PERMISSIONS,
+  requestMultiple,
+  checkMultiple,
+} from 'react-native-permissions';
 
 import {UserContext} from '../../App';
 import style from '../../style/style';
@@ -23,27 +27,24 @@ import {
   fontFamilyBold,
   fontFamilyNormal,
   fontFamilyRegular,
-  fontFamilyThin,
 } from '../../constant/fonts';
 import {
   getLoginMobile,
   getLoginPassword,
-  getCreateAccount,
+  getSignupUsername,
   getVerifyOTP,
   getResendOTP,
+  getSignupPassword,
+  getSignupProfile,
   getForgotOtpVerify,
   getForgotChangePassword,
 } from './request';
 // import {getAppSetting} from './../redux/store/index';
 import {APPSVERSION} from '../../constant/config';
+import Loader from '../components/loading';
 
 const LoginScreen = ({navigation, onDone}) => {
   const toast = useRef(null);
-
-  const [visible, setVisible] = React.useState(false);
-
-  const onToggleSnackBar = () => setVisible(!visible);
-  const onDismissSnackBar = () => setVisible(false);
 
   const {signIn} = useContext(UserContext);
   // LOGIN
@@ -53,9 +54,11 @@ const LoginScreen = ({navigation, onDone}) => {
   const [password, setPassword] = useState('');
   // SIGNUP
   const [name, setName] = useState('');
-  const [mobilereg, setMobilereg] = useState('');
+  const [gender, setGender] = useState('');
+  const [dob, setDob] = useState('');
   const [cropmobile, setCropMobile] = useState('');
   const [passwordreg, setPasswordreg] = useState('');
+  const [cpasswordreg, setCpasswordreg] = useState('');
   const [otp, setOTP] = useState('');
   // FORGOT
   const [fotp, setFOTP] = useState('');
@@ -66,14 +69,16 @@ const LoginScreen = ({navigation, onDone}) => {
   const [btnLoginloading, setBtnLoginloading] = useState(false);
 
   const [login, setLogin] = useState(true);
-  const [loginpassword, setLoginPassword] = useState(true);
-  const [signup, setSignup] = useState(false);
+  const [signupstep1, setSignupStep1] = useState(false);
+  const [signupstep2, setSignupStep2] = useState(false);
+  const [signupstep3, setSignupStep3] = useState(false);
+
+  const [loginpassword, setLoginPassword] = useState(false);
   const [forgot, setForgot] = useState(false);
   const [forgototp, setForgotOtp] = useState(false);
   const [passwordpage, setNewPassword] = useState(false);
 
   const [passwordsecure, setPasswordsecure] = useState(true);
-  const [visibleerror, setVisibleError] = useState(false);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [appsettingdata, setAppsetting] = useState([]);
@@ -84,11 +89,23 @@ const LoginScreen = ({navigation, onDone}) => {
     try {
       requestMultiple(
         Platform.select({
-          android: [PERMISSIONS.ANDROID.READ_SMS, PERMISSIONS.ANDROID.RECEIVE_SMS, PERMISSIONS.ANDROID.READ_CONTACTS],
+          android: [
+            PERMISSIONS.ANDROID.READ_SMS,
+            PERMISSIONS.ANDROID.RECEIVE_SMS,
+            PERMISSIONS.ANDROID.READ_CONTACTS,
+          ],
         }),
       ).then(() => {
-        checkMultiple([PERMISSIONS.ANDROID.READ_SMS, PERMISSIONS.ANDROID.RECEIVE_SMS, PERMISSIONS.ANDROID.READ_CONTACTS]).then((statuses) => {
-          if (statuses[PERMISSIONS.ANDROID.READ_SMS] === 'denied' || statuses[PERMISSIONS.RECEIVE_SMS] === 'denied' || statuses[PERMISSIONS.READ_CONTACTS] === 'denied') {
+        checkMultiple([
+          PERMISSIONS.ANDROID.READ_SMS,
+          PERMISSIONS.ANDROID.RECEIVE_SMS,
+          PERMISSIONS.ANDROID.READ_CONTACTS,
+        ]).then(statuses => {
+          if (
+            statuses[PERMISSIONS.ANDROID.READ_SMS] === 'denied' ||
+            statuses[PERMISSIONS.RECEIVE_SMS] === 'denied' ||
+            statuses[PERMISSIONS.READ_CONTACTS] === 'denied'
+          ) {
             console.log('denied');
             Alert.alert(
               'Warning!',
@@ -104,46 +121,48 @@ const LoginScreen = ({navigation, onDone}) => {
                   onPress: () => props.navigation.navigate('Swipe'),
                 },
               ],
-              { cancelable: false },
+              {cancelable: false},
             );
           }
           console.log('location', statuses);
-          if (statuses[PERMISSIONS.ANDROID.READ_SMS] === 'granted' && statuses[PERMISSIONS.ANDROID.RECEIVE_SMS] === 'granted' && statuses[PERMISSIONS.ANDROID.READ_CONTACTS] === 'granted') {
+          if (
+            statuses[PERMISSIONS.ANDROID.READ_SMS] === 'granted' &&
+            statuses[PERMISSIONS.ANDROID.RECEIVE_SMS] === 'granted' &&
+            statuses[PERMISSIONS.ANDROID.READ_CONTACTS] === 'granted'
+          ) {
             console.log(statuses);
             // DeviceInfo.syncUniqueId().then(uniqueId => {
             //   setDevice(uniqueId)
             // });
-            
+
             // let deviceId = DeviceInfo.getDeviceId();
 
-              // DeviceInfo.getDeviceName().then(deviceName => {
-              //   console.log('deviceName', deviceName)
-              //   setDeviceName(deviceName)
-              // });
+            // DeviceInfo.getDeviceName().then(deviceName => {
+            //   console.log('deviceName', deviceName)
+            //   setDeviceName(deviceName)
+            // });
 
-              // let model = DeviceInfo.getModel();
-              // setModel(model)
-              // console.log('model', model)
+            // let model = DeviceInfo.getModel();
+            // setModel(model)
+            // console.log('model', model)
 
-              // let systemName = DeviceInfo.getSystemName();
-              // setSystemName(systemName)
-              // console.log('systemName', systemName)
-              
-              // let systemVersion = DeviceInfo.getSystemVersion();
-              // console.log('systemVersion', systemVersion)
-              // setSystemVersion(systemVersion)
-              
-              // let brand = DeviceInfo.getBrand();
-              // setBrands(brand)
-              // console.log('brands', brand)
+            // let systemName = DeviceInfo.getSystemName();
+            // setSystemName(systemName)
+            // console.log('systemName', systemName)
 
-              // DeviceInfo.getPhoneNumber()
-              // .then(phoneNumber => {
-              //   setPhonenumber(phoneNumber)
-              //   console.log('phoneNumber', phoneNumber)
-              // });
-              
-            
+            // let systemVersion = DeviceInfo.getSystemVersion();
+            // console.log('systemVersion', systemVersion)
+            // setSystemVersion(systemVersion)
+
+            // let brand = DeviceInfo.getBrand();
+            // setBrands(brand)
+            // console.log('brands', brand)
+
+            // DeviceInfo.getPhoneNumber()
+            // .then(phoneNumber => {
+            //   setPhonenumber(phoneNumber)
+            //   console.log('phoneNumber', phoneNumber)
+            // });
           } else {
             console.log('else');
             Alert.alert(
@@ -160,7 +179,7 @@ const LoginScreen = ({navigation, onDone}) => {
                   onPress: () => props.navigation.navigate('SliderScreen'),
                 },
               ],
-              { cancelable: false },
+              {cancelable: false},
             );
           }
         });
@@ -168,8 +187,13 @@ const LoginScreen = ({navigation, onDone}) => {
     } catch (error) {
       console.log('location set error:', error);
     }
-
   }, []);
+
+  const wait = timeout => {
+    return new Promise(resolve => {
+      setTimeout(resolve, timeout);
+    });
+  };
 
   const appsetting = () => {
     // getAppSetting().then(result => {
@@ -181,25 +205,6 @@ const LoginScreen = ({navigation, onDone}) => {
     //   }
     //   setAppsetting(result);
     // });
-  };
-
-  const setMobileregdata = e => {
-    setMobilereg(e);
-    var crop1 = e.substring(0, 2);
-    var crop2 = e.substring(7, 10);
-    var cropdata = `${crop1}XXXXX${crop2}`;
-    setCropMobile(cropdata);
-  };
-
-  const setShowSignup = () => {
-    setSignup(true);
-    setLogin(false);
-  };
-
-  const setShowLogin = () => {
-    setLogin(true);
-    setSignup(false);
-    setForgot(false);
   };
 
   const setShowForgot = () => {
@@ -222,105 +227,166 @@ const LoginScreen = ({navigation, onDone}) => {
     var checkdata = validateEmail(username);
     if (checkdata === true) {
       setEmail(username);
+      setMobile('');
     } else {
-      setEmail(username);
+      setMobile(username);
+      setEmail();
     }
-    // console.log('checkdata', checkdata, mobile);
     getLoginMobile(username).then(async result => {
       if (result.status === 'fail') {
         setBtnLoginloading(false);
+        setSignupStep1(true);
+        setLogin(false);
         return toast.current.show(result.message, {type: 'danger'});
       } else {
-        // setIsloading(true);
-        setLogin(false);
         setLoginPassword(true);
+        setLogin(false);
         toast.current.show(result.message, {type: 'success'});
       }
     });
   };
+
+  const signup1ToLoginUsername = () => {
+    setLogin(true);
+    setSignupStep1(false);
+  };
+
+  const LoginPasswordToLoginUsername = () => {
+    setLogin(true);
+    setLoginPassword(false);
+  };
+  
+  const myStopFunction = () => {
+    var myTimeout = setTimeout(setIsloading(false), 1000);
+    clearTimeout(myTimeout);
+  }
 
   const Passwordnow = () => {
     if (password === '') {
       return toast.current.show('Enter your mobile or email', {type: 'danger'});
     }
     getLoginPassword(username, password).then(async result => {
-      if (result.status === 'fail') {
+      console.log('getLoginPassword', result)
+      if (result.status === 'fail' && result.state === "profile") {
+        setSignupStep3(true);
+        setLoginPassword(false);
+        setBtnLoginloading(false);
+        return toast.current.show(result.message, {type: 'danger'});
+      } else if (result.status === 'fail') {
         setBtnLoginloading(false);
         return toast.current.show(result.message, {type: 'danger'});
       } else {
+        setIsloading(true);
+        await signIn(result.token);
+      }
+    });
+  };
+  // // REGISTER STEP - 2 - SET USERNAME - MOBILE, EMAIL
+  const onSubmitSignupStep1 = () => {
+    if (mobile.toString().length < 10) {
+      return toast.current.show('Please enter 10 digit mobile number', {
+        type: 'danger',
+      });
+    }
+    if (email === '') {
+      return toast.current.show('Please enter Email Id', {type: 'danger'});
+    }
+    getSignupUsername(mobile, email).then(result => {
+      // ToastAndroid.show(result.message, ToastAndroid.LONG);
+      if (result.status === 'success') {
+        refRBSheet.current.open();
+      } else {
+        return toast.current.show(result.message, {type: 'danger'});
+      }
+    });
+  };
+  // // REGISTRATION RESEND OTP
+  const ResendRegOTP = () => {
+    getResendOTP(mobile).then(result => {
+      if (result.status === 'fail') {
+        ToastAndroid.show(result.message, ToastAndroid.LONG);
+      } else {
+        ToastAndroid.show(
+          `OTP Resend to mobile ${cropmobile}`,
+          ToastAndroid.LONG,
+        );
+      }
+    });
+  };
+  // // REGISTRATION VERIFY OTP
+  const VerifyOTP = () => {
+    if (otp.toString().trim().length !== 4) {
+      return Alert.alert('Enter 4 digit vefication OTP');
+    }
+    getVerifyOTP(mobile, otp).then(result => {
+      console.log('result.status', result);
+      ToastAndroid.show(result.message, ToastAndroid.LONG);
+      if (result.status === 'fail') {
+      } else {
+        setSignupStep1(false);
+        setSignupStep2(true);
+        refRBSheet.current.close();
+        setIsloading(true);
+        // signIn(result.token);
+      }
+    });
+  };
+  // // REGISTER STEP - 2 - SET PASSWORD
+  const onSubmitSignupStep2 = () => {
+    if (passwordreg.toString().trim().length < 6) {
+      return toast.current.show('Please enter 6 digit password', {
+        type: 'danger',
+      });
+    }
+    if (cpasswordreg.toString().trim().length < 6) {
+      return toast.current.show('Please confirm your password', {
+        type: 'danger',
+      });
+    }
+    if (passwordreg.toString().trim() !== cpasswordreg.toString().trim()) {
+      return toast.current.show('Password did not match', {
+        type: 'danger',
+      });
+    }
+    getSignupPassword(mobile, passwordreg).then(result => {
+      ToastAndroid.show(result.message, ToastAndroid.LONG);
+      if (result.status === 'success') {
+        setSignupStep2(false);
+        setSignupStep3(true);
+      }
+    });
+  };
+  // // REGISTER STEP - 3 - SET PROFILE - NAME, GENDER, DOB
+  const onSubmitSignupStep3 = () => {
+    if (name === '' && name.toString().trim().length < 3) {
+      return toast.current.show('Please Enter your name', {type: 'danger'});
+    }
+    if (gender === '') {
+      return toast.current.show('Please select your gender', {type: 'danger'});
+    }
+    if (dob === '') {
+      return toast.current.show('Please select your date of birth', {type: 'danger'});
+    }
+    getSignupProfile(mobile, name, gender, dob).then(async result => {
+      if (result.status === 'success') {
         toast.current.show(result.message, {type: 'success'});
         await signIn(result.token);
       }
     });
-  }
-  // // REGISTER A/C
-  // const RegisterAccount = () => {
-  //   if (name === '' && name.toString().trim().length < 3) {
-  //     return toast.current.show("Please Enter your name", { type: "danger" });
-  //   }
-  //   if (mobilereg.toString().length < 10) {
-  //     return toast.current.show("Please enter 10 digit mobile number", { type: "danger" });
-  //   }
-  //   if (email === '') {
-  //     return toast.current.show("Please enter Email Id", { type: "danger" });
-  //   }
-  //   if (passwordreg.toString().trim().length < 6) {
-  //     return toast.current.show('Please enter 6 digit password', { type: "danger" });
-  //   }
-  //   getCreateAccount(name, mobilereg, email, passwordreg).then(result => {
-  //     ToastAndroid.show(result.message, ToastAndroid.LONG);
-  //     if (result.status === 'success') {
-  //       refRBSheet.current.open();
-  //     }
-  //   });
-  // };
-  // // REGISTRATION RESEND OTP
-  // const ResendRegOTP = () => {
-  //   getResendOTP(mobilereg).then(result => {
-  //     if (result.status === 'fail') {
-  //       ToastAndroid.show(result.message, ToastAndroid.LONG);
-  //     } else {
-  //       ToastAndroid.show(
-  //         `OTP Resend to mobile ${cropmobile}`,
-  //         ToastAndroid.LONG,
-  //       );
-  //     }
-  //   });
-  // };
-  // // REGISTRATION VERIFY OTP
-  // const VerifyOTP = () => {
-  //   if (otp.toString().trim().length !== 4) {
-  //     return Alert.alert('Enter 4 digit vefication OTP');
-  //   }
-  //   getVerifyOTP(mobilereg, otp).then(result => {
-  //     ToastAndroid.show(result.message, ToastAndroid.LONG);
-  //     if (result.status === 'fail') {
-  //     } else {
-  //       refRBSheet.current.close();
-  //       setIsloading(true);
-  //       signIn(result.token);
-  //     }
-  //   });
-  // };
+  };
 
-  if (loading) {
+  if(loading){
     return (
-      <ActivityIndicator
-        size="large"
-        color="blue"
-        style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
-      />
-    );
+      <Loader message={'Loading...'} />
+    )
   }
 
   if (login) {
     return (
       <SafeAreaView style={styles.body}>
         <Appbar.Header style={style.header}>
-          <Appbar.Content
-            title="Your Phone"
-            titleStyle={style.headertitle}
-          />
+          <Appbar.BackAction onPress={() => navigation.goBack()} />
+          <Appbar.Content title="Your Phone" titleStyle={style.headertitle} />
         </Appbar.Header>
         <Toast ref={toast} duration={3000} />
         <View style={{padding: 15}}>
@@ -328,7 +394,7 @@ const LoginScreen = ({navigation, onDone}) => {
             <TextInput
               label="Mobile or Email Id"
               mode="outlined"
-              style={style.inputBox}
+              style={styles.inputBox}
               value={username}
               onChangeText={setUsername}
               theme={style.textinput}
@@ -350,10 +416,7 @@ const LoginScreen = ({navigation, onDone}) => {
         </View>
 
         <View style={styles.roundbtnabs}>
-          <Button
-            mode="contained"
-            style={styles.roundbtn}
-            onPress={Loginnow}>
+          <Button mode="contained" style={styles.roundbtn} onPress={Loginnow}>
             <Icon name={'arrow-right'} size={26} color="#FFF" />
           </Button>
         </View>
@@ -380,15 +443,15 @@ const LoginScreen = ({navigation, onDone}) => {
             </View>
           </View>
         </Modal>
-
       </SafeAreaView>
     );
   }
-
+  
   if (loginpassword) {
     return (
       <SafeAreaView style={styles.body}>
         <Appbar.Header style={style.header}>
+          <Appbar.BackAction onPress={() => LoginPasswordToLoginUsername()} />
           <Appbar.Content
             title="Your Password"
             titleStyle={style.headertitle}
@@ -400,8 +463,9 @@ const LoginScreen = ({navigation, onDone}) => {
             <TextInput
               label="Password"
               mode="outlined"
-              style={style.inputBox}
+              style={styles.inputBox}
               value={password}
+              secureTextEntry={true}
               onChangeText={setPassword}
               theme={style.textinput}
             />
@@ -416,96 +480,49 @@ const LoginScreen = ({navigation, onDone}) => {
             <Icon name={'arrow-right'} size={26} color="#FFF" />
           </Button>
         </View>
-
       </SafeAreaView>
     );
   }
 
-  if (signup) {
+  if (signupstep1) {
     return (
       <SafeAreaView style={styles.body}>
-        {/* <Toast ref={toast}
-          duration={3000} 
-        /> */}
+        <Appbar.Header style={style.header}>
+          <Appbar.BackAction onPress={() => signup1ToLoginUsername()} />
+          <Appbar.Content title="Signup" titleStyle={style.headertitle} />
+        </Appbar.Header>
+        <Toast ref={toast} duration={3000} />
         <View style={{padding: 15}}>
-          <TouchableOpacity onPress={setShowLogin}>
-            <Icon
-              name={'arrow-left'}
-              size={22}
-              color="black"
-              style={{paddingRight: 0, marginTop: 5}}
+          <View style={{marginTop: 50}}>
+            <TextInput
+              label="Mobile"
+              mode="outlined"
+              style={styles.inputBox}
+              value={mobile}
+              onChangeText={setMobile}
+              theme={style.textinput}
             />
-          </TouchableOpacity>
-        </View>
-        <ScrollView style={style.body}>
-          <View style={{padding: 15}}>
-            <View style={{marginTop: 20, flexDirection: 'row'}}>
-              <View style={{flex: 2}}>
-                <Text style={style.welcome}>Create Account,</Text>
-                <Text style={style.signin}>Signup to get started!</Text>
-              </View>
-            </View>
-
-            <View style={{marginTop: 50}}>
-              <TextInput
-                label="Name"
-                mode="outlined"
-                style={style.inputBox}
-                value={name}
-                onChangeText={setName}
-                theme={{colors: {primary: 'transparent'}}}
-              />
-              <TextInput
-                label="Mobile Number"
-                mode="outlined"
-                keyboardType={'phone-pad'}
-                style={style.inputBox}
-                value={mobilereg}
-                onChangeText={setMobileregdata}
-                theme={{colors: {primary: 'transparent'}}}
-              />
-              <TextInput
-                label="Email Id"
-                mode="outlined"
-                style={style.inputBox}
-                value={email}
-                onChangeText={setEmail}
-                theme={{colors: {primary: 'transparent'}}}
-              />
-              <TextInput
-                label="Password"
-                mode="outlined"
-                style={style.inputBox}
-                value={passwordreg}
-                secureTextEntry={true}
-                onChangeText={setPasswordreg}
-                theme={{colors: {primary: 'transparent'}}}
-              />
-            </View>
-
-            <Button
-              mode="contained"
-              style={style.bottomdarkbtn}
-              onPress={RegisterAccount}>
-              Create Account
-            </Button>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                marginTop: 20,
-                justifyContent: 'center',
-              }}>
-              <Text style={style.newuser}>Already have account? </Text>
-              <TouchableOpacity onPress={setShowLogin}>
-                <Text style={{fontFamily: fontFamilyBold, color: '#E30047'}}>
-                  Login
-                </Text>
-              </TouchableOpacity>
-            </View>
+            <TextInput
+              label="Email Id"
+              mode="outlined"
+              style={styles.inputBox}
+              value={email}
+              onChangeText={setEmail}
+              theme={style.textinput}
+            />
           </View>
-        </ScrollView>
-        {/* <RBSheet
+        </View>
+
+        <View style={styles.roundbtnabs}>
+          <Button
+            mode="contained"
+            style={styles.roundbtn}
+            onPress={onSubmitSignupStep1}>
+            <Icon name={'arrow-right'} size={26} color="#FFF" />
+          </Button>
+        </View>
+
+        <RBSheet
           ref={refRBSheet}
           closeOnDragDown={true}
           closeOnPressMask={false}
@@ -519,8 +536,8 @@ const LoginScreen = ({navigation, onDone}) => {
             },
           }}>
           <View style={{paddingHorizontal: 20, paddingTop: 15}}>
-            <Text style={style.pagetitle}>Verify Phone</Text>
-            <Text style={style.pagetitle2}>
+            <Text style={styles.pagetitle}>Verify Phone</Text>
+            <Text style={styles.pagetitle2}>
               Enter the 4 digit verification code sent on your mobile number{' '}
               {cropmobile}
             </Text>
@@ -530,15 +547,15 @@ const LoginScreen = ({navigation, onDone}) => {
             <TextInput
               label="OTP"
               mode="outlined"
-              style={style.inputBox}
+              style={styles.inputBox}
               value={otp}
               onChangeText={setOTP}
               keyboardType={'number-pad'}
-              theme={{colors: {primary: "transparent"}}}
+              theme={style.textinput}
             />
 
-            <Button mode="contained" style={style.inputBtn} onPress={VerifyOTP}>
-              Verify and Create Account
+            <Button mode="contained" style={styles.btnlg} onPress={VerifyOTP}>
+              Verify Mobile
             </Button>
           </View>
 
@@ -548,21 +565,111 @@ const LoginScreen = ({navigation, onDone}) => {
               marginBottom: 10,
               justifyContent: 'center',
             }}>
-            <Text style={style.newuser}>Didn't receive code? </Text>
+            <Text style={styles.newuser}>Didn't receive code? </Text>
             <TouchableOpacity onPress={ResendRegOTP}>
-              <Text style={{fontFamily: fontFamilyBold, color: '#E30047'}}>
+              <Text style={{fontFamily: fontFamilyBold, color: '#000'}}>
                 Resend OTP
               </Text>
             </TouchableOpacity>
           </View>
-
-          <Snackbar visible={visibleerror}>
-            OTP sent to mobile {mobilereg}.
-          </Snackbar>
-        </RBSheet> */}
+        </RBSheet>
       </SafeAreaView>
     );
   }
+
+  if (signupstep2) {
+    return (
+      <SafeAreaView style={styles.body}>
+        <Appbar.Header style={style.header}>
+          <Appbar.BackAction onPress={() => signup1ToLoginUsername()} />
+          <Appbar.Content title="Set Password" titleStyle={style.headertitle} />
+        </Appbar.Header>
+        <Toast ref={toast} duration={3000} />
+        <View style={{padding: 15}}>
+          <View style={{marginTop: 50}}>
+            <TextInput
+              label="Password"
+              mode="outlined"
+              style={styles.inputBox}
+              value={passwordreg}
+              secureTextEntry={true}
+              onChangeText={setPasswordreg}
+              theme={style.textinput}
+            />
+            <TextInput
+              label="Confirm Password"
+              mode="outlined"
+              style={styles.inputBox}
+              value={cpasswordreg}
+              secureTextEntry={true}
+              onChangeText={setCpasswordreg}
+              theme={style.textinput}
+            />
+          </View>
+        </View>
+
+        <View style={styles.roundbtnabs}>
+          <Button
+            mode="contained"
+            style={styles.roundbtn}
+            onPress={onSubmitSignupStep2}>
+            <Icon name={'arrow-right'} size={26} color="#FFF" />
+          </Button>
+        </View>
+      </SafeAreaView>
+    );
+  }
+  
+  if (signupstep3) {
+    return (
+      <SafeAreaView style={styles.body}>
+        <Appbar.Header style={style.header}>
+          <Appbar.BackAction onPress={() => signup1ToLoginUsername()} />
+          <Appbar.Content title="Update Profile" titleStyle={style.headertitle} />
+        </Appbar.Header>
+        <Toast ref={toast} duration={3000} />
+        <View style={{padding: 15}}>
+          <View style={{marginTop: 50}}>
+            <TextInput
+              label="Name"
+              mode="outlined"
+              style={styles.inputBox}
+              value={name}
+              onChangeText={setName}
+              theme={style.textinput}
+            />
+            <TextInput
+              label="Gender"
+              mode="outlined"
+              style={styles.inputBox}
+              value={gender}
+              onChangeText={setGender}
+              theme={style.textinput}
+            />
+            
+            <TextInput
+              label="Date of Birth"
+              mode="outlined"
+              style={styles.inputBox}
+              value={dob}
+              onChangeText={setDob}
+              theme={style.textinput}
+            />
+          </View>
+        </View>
+
+        <View style={styles.roundbtnabs}>
+          <Button
+            mode="contained"
+            style={styles.roundbtn}
+            onPress={onSubmitSignupStep3}>
+            <Icon name={'arrow-right'} size={26} color="#FFF" />
+          </Button>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
 };
 const styles = StyleSheet.create({
   logo: {
@@ -588,10 +695,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderRadius: 10,
   },
-  inputBtn: {
+  btnlg: {
     padding: 7,
     marginTop: 6,
     borderRadius: 5,
+    backgroundColor: '#000',
   },
   inputBtn2: {
     padding: 3,
@@ -649,24 +757,19 @@ const styles = StyleSheet.create({
     fontFamily: fontFamilyNormal,
   },
 
-  inputBox: {
-    backgroundColor: '#fff',
-    marginBottom: 10,
-    borderColor: 'red',
-  },
   inputBtn: {
     marginBottom: 20,
     marginTop: 5,
     padding: 10,
   },
   roundbtn: {
-    borderWidth:1,
-    alignItems:'center',
-    justifyContent:'center',
-    width:65,
-    height:65,
-    backgroundColor:'#000',
-    borderRadius:40,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 65,
+    height: 65,
+    backgroundColor: '#000',
+    borderRadius: 40,
   },
   roundbtnabs: {
     position: 'absolute',

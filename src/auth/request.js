@@ -4,7 +4,7 @@ const headers = {
   'Content-Type': 'application/json',
   apikey: API_KEY,
 };
-
+// LOGIN WITH USERNAME
 export const getLoginMobile = async (username) => {
   const response = await fetch(`${URL_STRING}/authuser/login-username`, {
     method:'POST',
@@ -16,7 +16,7 @@ export const getLoginMobile = async (username) => {
   const data = await response.json();
   return data
 };
-
+// LOGIN WITH PASSWORD BY USING USERNAME
 export const getLoginPassword = async (username, password) => {
   const response = await fetch(`${URL_STRING}/authuser/login-password`, {
     method:'POST',
@@ -26,7 +26,19 @@ export const getLoginPassword = async (username, password) => {
   const data = await response.json();
   return data
 };
-
+// SIGNUP STEP - 1
+export const getSignupUsername = async (mobile, email) => {
+  const response = await fetch(`${URL_STRING}/authuser/signup-username`, {
+    method:'POST',
+    headers,
+    body: JSON.stringify({
+      email, mobile
+    }),
+  });
+  const data = await response.json();
+  return data;
+};
+// SIGNUP STEP - 1 - VERIFY OTP
 export const getVerifyOTP = async (mobile, otp) => {
   const response = await fetch(`${URL_STRING}/authuser/otpverify`, {
     method:'POST',
@@ -34,6 +46,30 @@ export const getVerifyOTP = async (mobile, otp) => {
     body: JSON.stringify({
       otp,
       mobile,
+    }),
+  });
+  const data = await response.json();
+  return data;
+};
+// SIGNUP STEP - 2
+export const getSignupPassword = async (mobile, password) => {
+  const response = await fetch(`${URL_STRING}/authuser/set-password`, {
+    method:'POST',
+    headers,
+    body: JSON.stringify({
+      mobile, password
+    }),
+  });
+  const data = await response.json();
+  return data;
+};
+
+export const getSignupProfile = async (mobile, name, gender, dob) => {
+  const response = await fetch(`${URL_STRING}/authuser/set-profile`, {
+    method:'POST',
+    headers,
+    body: JSON.stringify({
+      mobile, name, gender, dob
     }),
   });
   const data = await response.json();
