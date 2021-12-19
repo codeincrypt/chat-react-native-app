@@ -157,3 +157,18 @@ export const getUpdateStatus = async (mystatus) => {
   const data = await response.json();
   return data;
 };
+
+export const getAppSetting = async () => {
+  const token = await AsyncStorage.getItem('thelvchatapp');
+  const response = await fetch(`${URL_STRING}/user/appsetting`, {
+    headers : {
+      'Content-Type': 'application/json',
+      apikey: API_KEY,
+      Authorization: 'Bearer ' + token,
+    },
+    method:"GET",
+  });
+  const data = await response.json();
+  return data;
+};
+

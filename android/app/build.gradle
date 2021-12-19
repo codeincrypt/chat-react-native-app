@@ -146,6 +146,13 @@ android {
         }
     }
     signingConfigs {
+        // release {
+        //     storeFile file('your_key_name.keystore')
+        //     storePassword 'kartik'
+        //     keyAlias 'kartik'
+        //     keyPassword 'kartik'
+        // }
+            
         debug {
             storeFile file('debug.keystore')
             storePassword 'android'

@@ -137,6 +137,7 @@ const ViewChat = props => {
           </Text>
         </View> */}
         <TouchableHighlight 
+        underlayColor='rgba(73,182,17,1,0.5)'
         onPress={() => console.log('short-press', item.id)}
         onLongPress={() => console.log('long-press', item.id)}
           style={

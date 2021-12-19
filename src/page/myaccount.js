@@ -32,12 +32,6 @@ const MyaccountScreen = props => {
   const [profiledata, setProfile] = useState('');
   const [profileimg, setProfileimg] = useState('https://chatapi.lvkart.com/default/default-user.png');
 
-  // props.GET_PROFILE((data) => {
-  //   console.log('GET_PROFILE', data)
-  //   setProfileData(data)
-  //   setProfileimg(data.photo)
-  // }, (e) => console.log({e}))
-
   const fetchProfile = () => {
     getProfile().then(data => {
       setProfile(data);

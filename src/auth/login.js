@@ -9,8 +9,9 @@ import {
   TouchableOpacity,
   Modal,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
-import {TextInput, Button, Appbar} from 'react-native-paper';
+import {TextInput, Button, Appbar, IconButton} from 'react-native-paper';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import RBSheet from 'react-native-raw-bottom-sheet';
@@ -20,6 +21,9 @@ import {
   requestMultiple,
   checkMultiple,
 } from 'react-native-permissions';
+import DatePicker from 'react-native-date-picker';
+import RadioButtonRN from 'radio-buttons-react-native';
+import moment from 'moment';
 
 import {UserContext} from '../../App';
 import style from '../../style/style';
@@ -82,6 +86,17 @@ const LoginScreen = ({navigation, onDone}) => {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [appsettingdata, setAppsetting] = useState([]);
+
+  const [date, setDate] = useState(new Date());
+  const [open, setOpen] = useState(false);
+
+  const data = [{label: 'Male'}, {label: 'Female'}];
+
+  const setDobDates = e => {
+    setDate(e);
+    const newdates = moment(e).format('DD-MM-YYYY');
+    setDob(newdates);
+  };
 
   useEffect(() => {
     appsetting();
@@ -189,12 +204,6 @@ const LoginScreen = ({navigation, onDone}) => {
     }
   }, []);
 
-  const wait = timeout => {
-    return new Promise(resolve => {
-      setTimeout(resolve, timeout);
-    });
-  };
-
   const appsetting = () => {
     // getAppSetting().then(result => {
     //   if (APPSVERSION !== result.appversion) {
@@ -240,7 +249,7 @@ const LoginScreen = ({navigation, onDone}) => {
         return toast.current.show(result.message, {type: 'danger'});
       } else {
         setLoginPassword(true);
-        setLogin(false);
+        setLogin(false)   
         toast.current.show(result.message, {type: 'success'});
       }
     });
@@ -255,19 +264,18 @@ const LoginScreen = ({navigation, onDone}) => {
     setLogin(true);
     setLoginPassword(false);
   };
-  
+
   const myStopFunction = () => {
     var myTimeout = setTimeout(setIsloading(false), 1000);
     clearTimeout(myTimeout);
-  }
+  };
 
   const Passwordnow = () => {
     if (password === '') {
       return toast.current.show('Enter your mobile or email', {type: 'danger'});
     }
     getLoginPassword(username, password).then(async result => {
-      console.log('getLoginPassword', result)
-      if (result.status === 'fail' && result.state === "profile") {
+      if (result.status === 'fail' && result.state === 'profile') {
         setSignupStep3(true);
         setLoginPassword(false);
         setBtnLoginloading(false);
@@ -276,8 +284,12 @@ const LoginScreen = ({navigation, onDone}) => {
         setBtnLoginloading(false);
         return toast.current.show(result.message, {type: 'danger'});
       } else {
-        setIsloading(true);
-        await signIn(result.token);
+        setIsloading(true)
+        const logging = async () => {
+          setIsloading(false)
+          await signIn(result.token)
+        }
+        setTimeout(logging, 2000);
       }
     });
   };
@@ -319,15 +331,12 @@ const LoginScreen = ({navigation, onDone}) => {
       return Alert.alert('Enter 4 digit vefication OTP');
     }
     getVerifyOTP(mobile, otp).then(result => {
-      console.log('result.status', result);
       ToastAndroid.show(result.message, ToastAndroid.LONG);
       if (result.status === 'fail') {
       } else {
-        setSignupStep1(false);
-        setSignupStep2(true);
         refRBSheet.current.close();
-        setIsloading(true);
-        // signIn(result.token);
+        setSignupStep2(true);
+        setSignupStep1(false);
       }
     });
   };
@@ -351,34 +360,49 @@ const LoginScreen = ({navigation, onDone}) => {
     getSignupPassword(mobile, passwordreg).then(result => {
       ToastAndroid.show(result.message, ToastAndroid.LONG);
       if (result.status === 'success') {
-        setSignupStep2(false);
         setSignupStep3(true);
+        setSignupStep2(false);
       }
     });
   };
   // // REGISTER STEP - 3 - SET PROFILE - NAME, GENDER, DOB
   const onSubmitSignupStep3 = () => {
+    setBtnLoginloading(true);
     if (name === '' && name.toString().trim().length < 3) {
+      setBtnLoginloading(false);
       return toast.current.show('Please Enter your name', {type: 'danger'});
     }
     if (gender === '') {
       return toast.current.show('Please select your gender', {type: 'danger'});
     }
     if (dob === '') {
-      return toast.current.show('Please select your date of birth', {type: 'danger'});
+      return toast.current.show('Please select your date of birth', {
+        type: 'danger',
+      });
     }
-    getSignupProfile(mobile, name, gender, dob).then(async result => {
+    getSignupProfile(mobile, name, gender.label, dob).then(async result => {
       if (result.status === 'success') {
         toast.current.show(result.message, {type: 'success'});
-        await signIn(result.token);
+        
+        const greeting = async () =>{
+          setBtnLoginloading(false)
+          setIsloading(true)
+        }
+        
+        setTimeout(greeting, 1000);
+
+        const logging = async () => {
+          setIsloading(false)
+          await signIn(result.token)
+        }
+
+        setTimeout(logging, 2000);
       }
     });
   };
 
-  if(loading){
-    return (
-      <Loader message={'Loading...'} />
-    )
+  if (loading) {
+    return <Loader message={'Loading...'} />;
   }
 
   if (login) {
@@ -416,9 +440,13 @@ const LoginScreen = ({navigation, onDone}) => {
         </View>
 
         <View style={styles.roundbtnabs}>
-          <Button mode="contained" style={styles.roundbtn} onPress={Loginnow}>
-            <Icon name={'arrow-right'} size={26} color="#FFF" />
-          </Button>
+          <IconButton
+            onPress={Loginnow}
+            style={styles.roundbtn}
+            icon="arrow-right"
+            color="#FFF"
+            size={26}
+          />
         </View>
 
         <Modal animationType="slide" transparent={true} visible={modalVisible}>
@@ -446,7 +474,7 @@ const LoginScreen = ({navigation, onDone}) => {
       </SafeAreaView>
     );
   }
-  
+
   if (loginpassword) {
     return (
       <SafeAreaView style={styles.body}>
@@ -465,7 +493,20 @@ const LoginScreen = ({navigation, onDone}) => {
               mode="outlined"
               style={styles.inputBox}
               value={password}
-              secureTextEntry={true}
+              secureTextEntry={passwordsecure}
+              right={
+                passwordsecure === true ? (
+                  <TextInput.Icon
+                    name="eye"
+                    onPress={e => setPasswordsecure(false)}
+                  />
+                ) : (
+                  <TextInput.Icon
+                    name="eye-off"
+                    onPress={e => setPasswordsecure(true)}
+                  />
+                )
+              }
               onChangeText={setPassword}
               theme={style.textinput}
             />
@@ -473,12 +514,13 @@ const LoginScreen = ({navigation, onDone}) => {
         </View>
 
         <View style={styles.roundbtnabs}>
-          <Button
-            mode="contained"
+          <IconButton
+            onPress={Passwordnow}
             style={styles.roundbtn}
-            onPress={Passwordnow}>
-            <Icon name={'arrow-right'} size={26} color="#FFF" />
-          </Button>
+            icon="arrow-right"
+            color="#FFF"
+            size={26}
+          />
         </View>
       </SafeAreaView>
     );
@@ -514,12 +556,13 @@ const LoginScreen = ({navigation, onDone}) => {
         </View>
 
         <View style={styles.roundbtnabs}>
-          <Button
-            mode="contained"
+          <IconButton
+            onPress={onSubmitSignupStep1}
             style={styles.roundbtn}
-            onPress={onSubmitSignupStep1}>
-            <Icon name={'arrow-right'} size={26} color="#FFF" />
-          </Button>
+            icon="arrow-right"
+            color="#FFF"
+            size={26}
+          />
         </View>
 
         <RBSheet
@@ -609,23 +652,27 @@ const LoginScreen = ({navigation, onDone}) => {
         </View>
 
         <View style={styles.roundbtnabs}>
-          <Button
-            mode="contained"
+          <IconButton
+            onPress={onSubmitSignupStep2}
             style={styles.roundbtn}
-            onPress={onSubmitSignupStep2}>
-            <Icon name={'arrow-right'} size={26} color="#FFF" />
-          </Button>
+            icon="arrow-right"
+            color="#FFF"
+            size={26}
+          />
         </View>
       </SafeAreaView>
     );
   }
-  
+
   if (signupstep3) {
     return (
       <SafeAreaView style={styles.body}>
         <Appbar.Header style={style.header}>
           <Appbar.BackAction onPress={() => signup1ToLoginUsername()} />
-          <Appbar.Content title="Update Profile" titleStyle={style.headertitle} />
+          <Appbar.Content
+            title="Update Profile"
+            titleStyle={style.headertitle}
+          />
         </Appbar.Header>
         <Toast ref={toast} duration={3000} />
         <View style={{padding: 15}}>
@@ -638,38 +685,65 @@ const LoginScreen = ({navigation, onDone}) => {
               onChangeText={setName}
               theme={style.textinput}
             />
-            <TextInput
-              label="Gender"
-              mode="outlined"
-              style={styles.inputBox}
-              value={gender}
-              onChangeText={setGender}
-              theme={style.textinput}
+
+            <View style={{marginBottom:10}}>
+              <Text style={{color: '#444'}}>Gender</Text>
+              <RadioButtonRN
+                data={data}
+                activeColor="#000"
+                selectedBtn={e => setGender(e)}
+                icon={<Icon name="check-circle" size={25} color="#2c9dd1" />}
+              />
+            </View>
+
+            <DatePicker
+              modal
+              open={open}
+              title="Select Date of Birth"
+              textColor="#FFF"
+              fadeToColor="none"
+              date={date}
+              androidVariant="nativeAndroid"
+              mode="date"
+              onConfirm={date => {
+                setOpen(false);
+                setDobDates(date);
+              }}
+              onCancel={() => {
+                setOpen(false);
+              }}
             />
-            
+
             <TextInput
               label="Date of Birth"
               mode="outlined"
               style={styles.inputBox}
               value={dob}
+              disabled={true}
               onChangeText={setDob}
               theme={style.textinput}
+              right={<TextInput.Icon name="calendar" onPress={() => setOpen(true)} />}
             />
           </View>
         </View>
 
         <View style={styles.roundbtnabs}>
-          <Button
-            mode="contained"
-            style={styles.roundbtn}
-            onPress={onSubmitSignupStep3}>
-            <Icon name={'arrow-right'} size={26} color="#FFF" />
-          </Button>
+          {btnLoginloading === false ? (
+            <IconButton
+              onPress={onSubmitSignupStep3}
+              style={styles.roundbtn}
+              icon="arrow-right"
+              color="#FFF"
+              size={26}
+            />
+          ) : (
+            <ActivityIndicator size={30} color="#FFF" style={styles.roundbtn} />
+          )}
+         
         </View>
       </SafeAreaView>
     );
   }
-
 };
 const styles = StyleSheet.create({
   logo: {
@@ -766,8 +840,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    width: 65,
-    height: 65,
+    width: 60,
+    height: 60,
     backgroundColor: '#000',
     borderRadius: 40,
   },

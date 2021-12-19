@@ -41,14 +41,13 @@ export default StyleSheet.create({
     fontWeight: '300',
     fontFamily: fontFamilyNormal,
   },
-
   textinput: {colors: {primary: '#000'}},
-
   lists: {
     flexDirection: 'row',
     flex: 1,
     paddingHorizontal: 10,
-    marginVertical: 5,
+    marginTop: 5,
+    paddingBottom: 10,
     borderBottomColor: '#EEE',
     borderBottomWidth: 1,
   },
@@ -83,19 +82,25 @@ export default StyleSheet.create({
     resizeMode: 'contain',
     alignItems: 'center',
   },
-
   contactname: {
     fontSize: 17,
     color: '#000',
     fontWeight: '700',
   },
   contactnumber: {
-    marginTop: 4,
+    marginTop: 3,
     fontSize: 14,
     color: '#000',
   },
 
   roundbtn : {
     backgroundColor: 'transparent'
+  },
+  contactimage: {
+    width: 45,
+    height: 45,
+    borderRadius: 30,
+    alignItems: 'center',
+    overflow: 'hidden',
   }
 });
