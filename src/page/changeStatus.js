@@ -1,17 +1,17 @@
-import React, {useState, useEffect, useContext} from 'react';
-import {Divider, Appbar, Menu} from 'react-native-paper';
+import React, {useState, useEffect, useRef} from 'react';
+import {Divider, Appbar, List, TextInput} from 'react-native-paper';
 import {
   View,
   Text,
   StyleSheet,
   FlatList,
-  ScrollView,
   ToastAndroid,
-  ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import RBSheet from 'react-native-raw-bottom-sheet';
 
-import {fontFamilyNormal, fontFamilyRegular} from '../../constant/fonts';
+import {fontFamilyBold, fontFamilyNormal, fontFamilyRegular} from '../../constant/fonts';
 import style from '../../style/style.js';
 import {getUpdateStatus} from '../redux/actions/request';
 import Loader from '../components/loading';
@@ -22,6 +22,8 @@ const MyStatusScreen = props => {
 
   const [loading, setIsloading] = useState(false);
 
+  const refRBSheet = useRef();
+
   const [mystatusform, setmystatusform] = useState(false);
   const [mystatus, setmystatus] = useState(profiledata.status);
 
@@ -31,6 +33,7 @@ const MyStatusScreen = props => {
       setmystatus(mystatus);
       if (result.status === 'success') {
         setIsloading(false);
+        refRBSheet.current.close();
         ToastAndroid.show(result.message, ToastAndroid.LONG);
       } else {
         ToastAndroid.show(result.message, ToastAndroid.LONG);
@@ -38,11 +41,23 @@ const MyStatusScreen = props => {
     });
   };
 
+  const SaveNewAbout = () => {
+    updateStatus(mystatus)
+  }
+
+  const openAbout = () => {
+    refRBSheet.current.open();
+  }
+
+  const cancelAbout = () => {
+    refRBSheet.current.close();
+  }
+
   useEffect(() => {}, []);
 
   const ItemList = ({item, index}) => {
     return (
-      <Menu.Item
+      <List.Item
         onPress={() => {
           updateStatus(item.statustext);
         }}
@@ -60,27 +75,25 @@ const MyStatusScreen = props => {
       {loading && (
         <Loader message={'Updating...'} />
       )}
-      <ScrollView>
-        <View
-          style={{
-            flex: 1,
-            padingBottom: 5,
-          }}>
-          <Menu.Item
+
+          <List.Item
             titleStyle={{
-              fontSize: 12,
+              fontSize: 11,
               fontWeight: '700',
             }}
             title="CURRENTLY"
           />
-          <Menu.Item
+          {/* <TouchableOpacity onPress={openAbout}> */}
+          <List.Item
             onPress={() => {
-              updateStatus(mystatus);
+              openAbout()
             }}
             title={mystatus}
+            right={props => <List.Icon {...props} icon="pencil" />}
           />
+          {/* </TouchableOpacity> */}
           <Divider />
-          <Menu.Item
+          <List.Item
             titleStyle={{
               fontSize: 11,
               fontWeight: '700',
@@ -93,8 +106,47 @@ const MyStatusScreen = props => {
             keyExtractor={(item, index) => index.toString()}
             numColumns={1}
           />
-        </View>
-      </ScrollView>
+
+
+      <RBSheet
+          ref={refRBSheet}
+          closeOnDragDown={true}
+          closeOnPressMask={false}
+          height={250}
+          customStyles={{
+            wrapper: {
+              backgroundColor: '#00000099',
+            },
+            draggableIcon: {
+              backgroundColor: '#BBB',
+            },
+          }}>
+          <View style={{paddingHorizontal: 20, paddingTop: 15}}>
+            <Text style={styles.pagetitle}>Update About</Text>
+          </View>
+
+          <View style={{padding: 15}}>
+            <TextInput
+              // label="About"
+              // mode="outlined"
+              multiline={true}
+              style={styles.inputBox}
+              value={mystatus}
+              onChangeText={setmystatus}
+              theme={style.textinput}
+            />
+            <View style={{flexDirection:'row'}}>
+              <TouchableOpacity style={{alignItems:'flex-end',padding:20}} onPress={cancelAbout}>
+                <Text style={{color: "#E30047", fontWeight: 'bold', fontSize: 16}}>CANCEL</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={{alignItems:'flex-end',padding:20}} onPress={SaveNewAbout}>
+                <Text style={{color: "#000", fontWeight: 'bold', fontSize: 16}}>UPDATE</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </RBSheet>
+     
+
     </SafeAreaView>
   );
 };
@@ -184,6 +236,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#00000088',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  
+  pagetitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#111',
+    fontFamily: fontFamilyBold,
   },
 });
 export default MyStatusScreen;

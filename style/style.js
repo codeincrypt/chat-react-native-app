@@ -15,7 +15,6 @@ export default StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-
   header: {
     backgroundColor: '#111',
     position: 'relative',
@@ -29,6 +28,12 @@ export default StyleSheet.create({
     marginLeft: -50,
     fontFamily: fontFamilyNormal,
     alignSelf: 'center',
+    color: '#FFF',
+  },
+  leftheadertitle: {
+    fontSize: 18,
+    fontWeight: '300',
+    fontFamily: fontFamilyNormal,
     color: '#FFF',
   },
   contactheadertitle: {
@@ -67,6 +72,7 @@ export default StyleSheet.create({
   listbody: {
     flex: 8,
     paddingLeft: 12,
+    paddingTop: 12,
   },
   listicon: {
     padding: 13,
@@ -90,17 +96,87 @@ export default StyleSheet.create({
   contactnumber: {
     marginTop: 3,
     fontSize: 14,
+    color: '#444',
+  },
+  statusmsg: {
+    marginTop: 3,
+    fontSize: 14,
     color: '#000',
+    fontWeight: '700',
   },
 
   roundbtn : {
     backgroundColor: 'transparent'
   },
-  contactimage: {
-    width: 45,
-    height: 45,
-    borderRadius: 30,
-    alignItems: 'center',
-    overflow: 'hidden',
-  }
+  btnlg: {
+    padding: 7,
+    marginTop: 6,
+    borderRadius: 5,
+    backgroundColor: '#000',
+  },
+  
+  modalicon: {
+    padding: 5,
+    height: 70,
+    width: '100%',
+    marginBottom: 25,
+    resizeMode: 'contain',
+  },
+  maintext: {
+    fontSize: 26,
+    color: '#000',
+  },
+
+  
+    // NODATA
+    ntext1: {
+      color: '#333',
+      paddingTop: 35,
+      fontSize: 24,
+      fontFamily:fontFamilyBold,
+  },
+    invitetext1: {
+      color: '#333',
+      paddingTop: 5,
+      fontSize: 24,
+      fontWeight: 'bold',
+  },
+    invitetext2: {
+      color: '#333',
+      paddingTop: 5,
+      fontSize: 22,
+      fontFamily:fontFamilyBold,
+  },
+  ntext2: {
+      color: '#222',
+      fontSize: 15,
+      paddingTop: 10,
+      textAlign:'center',
+      fontFamily:fontFamilyThin,
+  },
+  ntext3: {
+      color: '#222',
+      fontSize: 16,
+      textAlign:'center',
+      fontFamily:fontFamilyBold,
+      paddingTop: 10,
+      paddingBottom: 20,
+      paddingHorizontal:20,
+  },
+  nicon: {
+    width: 120,
+    height: 120,
+  },
+  nsection: {
+      marginTop:120,
+      flex:1,
+      padding: 30,
+      alignItems: 'center'
+  },
+  nsection2: {
+      marginTop:20,
+      flex:1,
+      padding: 30,
+      alignItems: 'center'
+  },
 });

@@ -8,7 +8,7 @@ import {
   Image,
   TouchableOpacity,
   Modal,
-  ScrollView,
+  Linking,
   ActivityIndicator,
 } from 'react-native';
 import {TextInput, Button, Appbar, IconButton} from 'react-native-paper';
@@ -46,6 +46,7 @@ import {
 // import {getAppSetting} from './../redux/store/index';
 import {APPSVERSION} from '../../constant/config';
 import Loader from '../components/loading';
+import {getAppSetting} from '../redux/actions/request';
 
 const LoginScreen = ({navigation, onDone}) => {
   const toast = useRef(null);
@@ -64,10 +65,6 @@ const LoginScreen = ({navigation, onDone}) => {
   const [passwordreg, setPasswordreg] = useState('');
   const [cpasswordreg, setCpasswordreg] = useState('');
   const [otp, setOTP] = useState('');
-  // FORGOT
-  const [fotp, setFOTP] = useState('');
-  const [fpassword, setFPassword] = useState('');
-  const [fcpassword, setFcPassword] = useState('');
 
   const [loading, setIsloading] = useState(false);
   const [btnLoginloading, setBtnLoginloading] = useState(false);
@@ -78,10 +75,6 @@ const LoginScreen = ({navigation, onDone}) => {
   const [signupstep3, setSignupStep3] = useState(false);
 
   const [loginpassword, setLoginPassword] = useState(false);
-  const [forgot, setForgot] = useState(false);
-  const [forgototp, setForgotOtp] = useState(false);
-  const [passwordpage, setNewPassword] = useState(false);
-
   const [passwordsecure, setPasswordsecure] = useState(true);
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -128,12 +121,12 @@ const LoginScreen = ({navigation, onDone}) => {
               [
                 {
                   text: 'Cancel',
-                  onPress: () => props.navigation.navigate('Swipe'),
+                  onPress: () => navigation.navigate('SliderScreen'),
                   style: 'cancel',
                 },
                 {
                   text: 'OK',
-                  onPress: () => props.navigation.navigate('Swipe'),
+                  onPress: () => navigation.navigate('SliderScreen'),
                 },
               ],
               {cancelable: false},
@@ -186,12 +179,12 @@ const LoginScreen = ({navigation, onDone}) => {
               [
                 {
                   text: 'Cancel',
-                  onPress: () => props.navigation.navigate('SliderScreen'),
+                  onPress: () => navigation.navigate('SliderScreen'),
                   style: 'cancel',
                 },
                 {
                   text: 'OK',
-                  onPress: () => props.navigation.navigate('SliderScreen'),
+                  onPress: () => navigation.navigate('SliderScreen'),
                 },
               ],
               {cancelable: false},
@@ -205,20 +198,15 @@ const LoginScreen = ({navigation, onDone}) => {
   }, []);
 
   const appsetting = () => {
-    // getAppSetting().then(result => {
-    //   if (APPSVERSION !== result.appversion) {
-    //     if (result.appupdate === 1) {
-    //       setModalVisible(true);
-    //       ToastAndroid.show(`A New version is available`, ToastAndroid.LONG);
-    //     }
-    //   }
-    //   setAppsetting(result);
-    // });
-  };
-
-  const setShowForgot = () => {
-    setForgot(true);
-    setLogin(false);
+    getAppSetting().then(result => {
+      if (APPSVERSION !== result.appversion) {
+        if (result.appupdate === 1) {
+          setModalVisible(true);
+          ToastAndroid.show(`A New version is available`, ToastAndroid.LONG);
+        }
+      }
+      setAppsetting(result);
+    });
   };
 
   const refRBSheet = useRef();
@@ -241,6 +229,7 @@ const LoginScreen = ({navigation, onDone}) => {
       setMobile(username);
       setEmail();
     }
+    setBtnLoginloading(true);
     getLoginMobile(username).then(async result => {
       if (result.status === 'fail') {
         setBtnLoginloading(false);
@@ -248,8 +237,9 @@ const LoginScreen = ({navigation, onDone}) => {
         setLogin(false);
         return toast.current.show(result.message, {type: 'danger'});
       } else {
+        setBtnLoginloading(true);
         setLoginPassword(true);
-        setLogin(false)   
+        setLogin(false);
         toast.current.show(result.message, {type: 'success'});
       }
     });
@@ -265,15 +255,11 @@ const LoginScreen = ({navigation, onDone}) => {
     setLoginPassword(false);
   };
 
-  const myStopFunction = () => {
-    var myTimeout = setTimeout(setIsloading(false), 1000);
-    clearTimeout(myTimeout);
-  };
-
   const Passwordnow = () => {
     if (password === '') {
       return toast.current.show('Enter your mobile or email', {type: 'danger'});
     }
+    setBtnLoginloading(true);
     getLoginPassword(username, password).then(async result => {
       if (result.status === 'fail' && result.state === 'profile') {
         setSignupStep3(true);
@@ -284,11 +270,12 @@ const LoginScreen = ({navigation, onDone}) => {
         setBtnLoginloading(false);
         return toast.current.show(result.message, {type: 'danger'});
       } else {
-        setIsloading(true)
+        setIsloading(true);
+        setBtnLoginloading(false);
         const logging = async () => {
-          setIsloading(false)
-          await signIn(result.token)
-        }
+          setIsloading(false);
+          await signIn(result.token);
+        };
         setTimeout(logging, 2000);
       }
     });
@@ -303,11 +290,14 @@ const LoginScreen = ({navigation, onDone}) => {
     if (email === '') {
       return toast.current.show('Please enter Email Id', {type: 'danger'});
     }
+    setBtnLoginloading(true);
     getSignupUsername(mobile, email).then(result => {
       // ToastAndroid.show(result.message, ToastAndroid.LONG);
       if (result.status === 'success') {
+        setBtnLoginloading(false);
         refRBSheet.current.open();
       } else {
+        setBtnLoginloading(false);
         return toast.current.show(result.message, {type: 'danger'});
       }
     });
@@ -330,11 +320,14 @@ const LoginScreen = ({navigation, onDone}) => {
     if (otp.toString().trim().length !== 4) {
       return Alert.alert('Enter 4 digit vefication OTP');
     }
+    setBtnLoginloading(true);
     getVerifyOTP(mobile, otp).then(result => {
       ToastAndroid.show(result.message, ToastAndroid.LONG);
       if (result.status === 'fail') {
+        setBtnLoginloading(false);
       } else {
         refRBSheet.current.close();
+        setBtnLoginloading(false);
         setSignupStep2(true);
         setSignupStep1(false);
       }
@@ -357,19 +350,21 @@ const LoginScreen = ({navigation, onDone}) => {
         type: 'danger',
       });
     }
+    setBtnLoginloading(true);
     getSignupPassword(mobile, passwordreg).then(result => {
       ToastAndroid.show(result.message, ToastAndroid.LONG);
       if (result.status === 'success') {
         setSignupStep3(true);
         setSignupStep2(false);
+        setBtnLoginloading(false);
+      } else {
+        setBtnLoginloading(false);
       }
     });
   };
   // // REGISTER STEP - 3 - SET PROFILE - NAME, GENDER, DOB
   const onSubmitSignupStep3 = () => {
-    setBtnLoginloading(true);
     if (name === '' && name.toString().trim().length < 3) {
-      setBtnLoginloading(false);
       return toast.current.show('Please Enter your name', {type: 'danger'});
     }
     if (gender === '') {
@@ -380,21 +375,22 @@ const LoginScreen = ({navigation, onDone}) => {
         type: 'danger',
       });
     }
+    setBtnLoginloading(true);
     getSignupProfile(mobile, name, gender.label, dob).then(async result => {
       if (result.status === 'success') {
         toast.current.show(result.message, {type: 'success'});
-        
-        const greeting = async () =>{
-          setBtnLoginloading(false)
-          setIsloading(true)
-        }
-        
+
+        const greeting = async () => {
+          setBtnLoginloading(false);
+          setIsloading(true);
+        };
+
         setTimeout(greeting, 1000);
 
         const logging = async () => {
-          setIsloading(false)
-          await signIn(result.token)
-        }
+          setIsloading(false);
+          await signIn(result.token);
+        };
 
         setTimeout(logging, 2000);
       }
@@ -423,47 +419,58 @@ const LoginScreen = ({navigation, onDone}) => {
               onChangeText={setUsername}
               theme={style.textinput}
             />
-
-            <TouchableOpacity onPress={setShowForgot}>
-              <Text
-                style={{
-                  fontSize: 14,
-                  marginTop: 15,
-                  textAlign: 'right',
-                  fontFamily: fontFamilyNormal,
-                  color: '#000',
-                }}>
-                Forgot Password ?
-              </Text>
-            </TouchableOpacity>
           </View>
+
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('ForgotPassword', {mobile: mobile})
+            }>
+            <Text
+              style={{
+                fontSize: 14,
+                marginTop: 15,
+                textAlign: 'right',
+                fontFamily: fontFamilyNormal,
+                color: '#000',
+              }}>
+              Forgot Password ?
+            </Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.roundbtnabs}>
-          <IconButton
-            onPress={Loginnow}
-            style={styles.roundbtn}
-            icon="arrow-right"
-            color="#FFF"
-            size={26}
-          />
+          {btnLoginloading === false ? (
+            <IconButton
+              onPress={Loginnow}
+              style={styles.roundbtn}
+              icon="arrow-right"
+              color="#FFF"
+              size={26}
+            />
+          ) : (
+            <ActivityIndicator size={30} color="#FFF" style={styles.roundbtn} />
+          )}
         </View>
 
         <Modal animationType="slide" transparent={true} visible={modalVisible}>
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
-              {/* <Image
-                source={require('../../../assets/image/play-store.png')}
-                style={styles.modalicon}
-              /> */}
+              <Image
+                source={require('../../assets/image/play-store.png')}
+                style={style.modalicon}
+              />
               <Text style={styles.modalTextTitle}>App Update Available</Text>
               <Text style={styles.modalTextSubtitle}>
                 A New Version is available. Please upgrade now {'\n'}
                 (Current: {APPSVERSION} Latest: {appsettingdata.appversion})
               </Text>
               <TouchableOpacity
-                style={styles.modalicons}
-                onPress={() => Linking.openURL(appsettingdata.androidlink)}>
+                style={styles.modalicon}
+                onPress={() =>
+                  Linking.openURL(
+                    'https://play.google.com/store/apps/details?id=com.intagedesign.chat',
+                  )
+                }>
                 <Text style={styles.textStyle}>
                   <Icon name={'upload'} size={15} color="#e74c3c" /> Update Now
                 </Text>
@@ -590,6 +597,7 @@ const LoginScreen = ({navigation, onDone}) => {
             <TextInput
               label="OTP"
               mode="outlined"
+              secureTextEntry={true}
               style={styles.inputBox}
               value={otp}
               onChangeText={setOTP}
@@ -597,7 +605,7 @@ const LoginScreen = ({navigation, onDone}) => {
               theme={style.textinput}
             />
 
-            <Button mode="contained" style={styles.btnlg} onPress={VerifyOTP}>
+            <Button mode="contained" style={style.btnlg} onPress={VerifyOTP}>
               Verify Mobile
             </Button>
           </View>
@@ -686,7 +694,7 @@ const LoginScreen = ({navigation, onDone}) => {
               theme={style.textinput}
             />
 
-            <View style={{marginBottom:10}}>
+            <View style={{marginBottom: 10}}>
               <Text style={{color: '#444'}}>Gender</Text>
               <RadioButtonRN
                 data={data}
@@ -700,7 +708,7 @@ const LoginScreen = ({navigation, onDone}) => {
               modal
               open={open}
               title="Select Date of Birth"
-              textColor="#FFF"
+              textColor="gray"
               fadeToColor="none"
               date={date}
               androidVariant="nativeAndroid"
@@ -722,7 +730,9 @@ const LoginScreen = ({navigation, onDone}) => {
               disabled={true}
               onChangeText={setDob}
               theme={style.textinput}
-              right={<TextInput.Icon name="calendar" onPress={() => setOpen(true)} />}
+              right={
+                <TextInput.Icon name="calendar" onPress={() => setOpen(true)} />
+              }
             />
           </View>
         </View>
@@ -739,7 +749,6 @@ const LoginScreen = ({navigation, onDone}) => {
           ) : (
             <ActivityIndicator size={30} color="#FFF" style={styles.roundbtn} />
           )}
-         
         </View>
       </SafeAreaView>
     );
@@ -768,12 +777,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     marginBottom: 10,
     borderRadius: 10,
-  },
-  btnlg: {
-    padding: 7,
-    marginTop: 6,
-    borderRadius: 5,
-    backgroundColor: '#000',
   },
   inputBtn2: {
     padding: 3,
@@ -937,10 +940,10 @@ const styles = StyleSheet.create({
   },
   modalicon: {
     padding: 5,
-    height: 70,
+    // height: 70,
     width: '100%',
-    marginBottom: 25,
-    resizeMode: 'contain',
+    // marginBottom: 10,
+    // resizeMode: 'contain',
   },
 });
 export default LoginScreen;

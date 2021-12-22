@@ -5,12 +5,16 @@ import style from '../../style/style'
 import {createStackNavigator} from '@react-navigation/stack';
 // import {DrawerContent} from './../navs/DrawerContent';
 
-// HOME PAGE
+// CHAT
 import ChatList from '../page/chatlist';
-import ContactList from '../page/contact';
-import MyaccountScreen from '../page/myaccount';
 import ViewChat from '../page/chat';
+import userProfile from '../page/userprofile';
+// PROFILE
+import MyaccountScreen from '../page/myaccount';
 import MyStatusScreen from '../page/changeStatus';
+// CONTACT
+import ContactList from '../page/contact';
+import InviteNow from '../page/inviteNow';
 
 const HomeStack = createStackNavigator();
 const ProfileStack = createStackNavigator();
@@ -55,6 +59,13 @@ const createHomeStack = ({navigation}) => {
           headerShown:false
         }}
       />
+      <HomeStack.Screen
+        name="chatuser"
+        component={userProfile}
+        options={{
+          headerShown:false
+        }}
+      />
     </HomeStack.Navigator>
   );
 };
@@ -71,6 +82,13 @@ const createContactStack = ({navigation}) => {
       <ContactStack.Screen
         name="ContactScreen"
         component={ContactList}
+        options={{
+          headerShown:false
+        }}
+      />
+      <ContactStack.Screen
+        name="InviteNow"
+        component={InviteNow}
         options={{
           headerShown:false
         }}

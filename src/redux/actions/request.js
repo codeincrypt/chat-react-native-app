@@ -124,6 +124,34 @@ export const getChatList = async () => {
   return data;
 };
 
+export const moveToSeen = async (userid) => {
+  const token = await AsyncStorage.getItem('thelvchatapp');
+  const response = await fetch(`${URL_STRING}/user/moveToSeen/${userid}`, {
+    method:'GET',
+    headers : {
+      'Content-type': 'application/json',
+      apikey: API_KEY,
+      Authorization: 'Bearer ' + token,
+    }
+  });
+  const data = await response.json();
+  return data;
+};
+
+export const getAllUserList = async () => {
+  const token = await AsyncStorage.getItem('thelvchatapp');
+  const response = await fetch(`${URL_STRING}/user/chatContactUser`, {
+    method:'GET',
+    headers : {
+      'Content-type': 'application/json',
+      apikey: API_KEY,
+      Authorization: 'Bearer ' + token,
+    }
+  });
+  const data = await response.json();
+  return data;
+};
+
 export const sendMessage = async (userid, message) => {
   const token = await AsyncStorage.getItem('thelvchatapp');
   const response = await fetch(`${URL_STRING}/user/sendMessage`, {

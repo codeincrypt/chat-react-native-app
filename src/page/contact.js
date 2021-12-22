@@ -8,9 +8,10 @@ import {
   FlatList,
   ScrollView,
   Image,
+  ToastAndroid,
   TouchableOpacity,
 } from 'react-native';
-import {Appbar, Searchbar, Divider, List} from 'react-native-paper';
+import {Appbar, Searchbar} from 'react-native-paper';
 import Contacts from 'react-native-contacts';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -19,7 +20,7 @@ import _ from 'underscore';
 import {GET_CONTACT} from '../redux/actions/contact';
 import {connect} from 'react-redux';
 import Loader from '../components/loading.js';
-import {getChatList, getProfile} from '../redux/actions/request.js';
+import {getAllUserList, getProfile} from '../redux/actions/request.js';
 
 const ContactList = props => {
   const [loading, setLoading] = useState(true);
@@ -61,14 +62,6 @@ const ContactList = props => {
             if (cont.substring(0, 3) === '+91' || cont.length === 10) {
               displayContact = cont.substr(cont.length - 10, 10);
             }
-            
-            // for(let k = 0; k < chatList.length; k++) {
-            //   if(chatList[k].contact === displayContact){
-            //     userdata = chatList[k]
-            //   } else {
-            //     userdata = {}
-            //   }
-            // }
 
             var matched = _.contains(chatlistdata, displayContact);
             var myArray = ['#10ac84', '#ee5253', '#0abde3', '#2e86de', '#222f3e', '#fa8231']
@@ -99,10 +92,14 @@ const ContactList = props => {
   };
 
   const fetchChatList = () => {
-    getChatList().then(chatList => {
+    getAllUserList().then(chatList => {
       loadContacts(chatList);
     });
   };
+
+  const comingSoon = () => {
+    ToastAndroid.show(`Invite feature is coming soon`, ToastAndroid.LONG);
+  }
 
   const search = e => {
     var searchString = e.toString().toLowerCase();
@@ -122,6 +119,7 @@ const ContactList = props => {
         onPress={() => {item.matched ===  true ? (
           props.navigation.navigate('Chat', {item: item.userdata, id:profile.id})
           ) : (
+            // comingSoon()
             props.navigation.navigate('InviteNow', {
               number: item.mobilenumber,
               name: item.displayName,
@@ -161,9 +159,9 @@ const ContactList = props => {
           </View>
           <View style={style.listbody}>
             <Text style={style.contactname}>{item.displayName}</Text>
-            <Text style={style.contactnumber}>{item.mobilenumber}</Text>
+            {/* <Text style={style.contactnumber}>{item.mobilenumber}</Text> */}
             {item.matched ? (
-              <Text style={style.contactnumber}>{item.userdata.mystatus}</Text>
+              <Text style={style.statusmsg} numberOfLines={1}>{item.userdata.mystatus}</Text>
             ) : (
               <Text style={style.contactnumber}>Invite Now</Text>
             )}
@@ -199,6 +197,7 @@ const ContactList = props => {
               renderItem={ItemList}
               keyExtractor={(item, index) => index.toString()}
               numColumns={1}
+              style={{marginBottom: 100}}
             />
           ) : (
             <ScrollView>

@@ -6,15 +6,16 @@ import {
   Image,
   ScrollView,
   FlatList,
-  RefreshControl,
   TouchableOpacity,
   TouchableHighlight,
   TextInput,
+  ToastAndroid
 } from 'react-native';
 import {Avatar, Appbar} from 'react-native-paper';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import IconButton from 'react-native-vector-icons/FontAwesome';
 import moment from 'moment';
+import _ from 'underscore';
 
 import style from '../../style/style.js';
 
@@ -22,19 +23,29 @@ import io from 'socket.io-client/dist/socket.io';
 import {WEBSOCKET} from '../../constant/config';
 import {GET_CHATVIEW, sendMessage, getProfile} from '../redux/actions/request';
 const socket = io(WEBSOCKET, {transports: ['websocket']}, {jsonp: false});
+import Clipboard from '@react-native-community/clipboard';
 
 const ViewChat = props => {
   const userdata = props.route.params.item;
   const myid = props.route.params.id;
+
   const [loading, setIsloading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [chatlist, setChatlist] = useState('');
+  const [chatlist, setChatlist] = useState([]);
+  const [chatuser, setChatUser] = useState();
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [typing, setTyping] = useState(false);
   const [profiledata, setProfile] = useState('');
 
+  const todayDate = moment().format('DD MMM YYYY');
+  const yesterdayDate = moment().subtract(1, 'day').format('DD MMM YYYY')
+
   useEffect(() => {
+    props.navigation.addListener('focus', () => {
+      fetchChatList();
+      fetchProfile();
+    });
     fetchChatList();
     fetchProfile();
     socket.on('newmessage', data => {
@@ -58,7 +69,12 @@ const ViewChat = props => {
   // FETCH USER CHAT
   const fetchChatList = () => {
     GET_CHATVIEW(userdata.id).then(data => {
-      setChatlist(data.message);
+      setChatUser(data.chatuser);
+      if(data.status === 'fail'){
+        setChatlist([]);
+      } else {
+        setChatlist(data.message);
+      }
     });
   };
 
@@ -98,16 +114,19 @@ const ViewChat = props => {
   const sendMsg = () => {
     const currentdate = moment().format('DD MMM YYYY');
     const currenttime = moment().format('hh:mm A');
-    if (message === '') {
+
+    var message2 = message.replace(/^[ ]+/g, "");
+
+    if (message2 === '') {
       return;
     }
     setSending(true);
-    sendMessage(userdata.id, message).then(data => {
+    sendMessage(userdata.id, message2).then(data => {
       var info = {
         date: currentdate,
         fromuser: myid,
         id: 1,
-        message: message,
+        message: message2,
         status: 1,
         time: currenttime,
         touser: userdata.id,
@@ -123,23 +142,25 @@ const ViewChat = props => {
   const ItemList = ({item, index}) => {
     return (
       <View style={{paddingVertical: 5, paddingHorizontal: 15}}>
-        {/* <View style={{alignItems: 'center', padding: 10}}>
-          <Text
-            style={{
-              fontSize: 11,
-              color: '#000',
-              backgroundColor: '#EEE',
-              borderRadius: 20,
-              paddingHorizontal: 25,
-              paddingVertical: 4,
-            }}>
-            {item.date}
-          </Text>
-        </View> */}
+          {item.matched === true ? (
+            <View style={{alignItems: 'center', padding: 10}}>
+              <Text
+                style={{
+                  fontSize: 11,
+                  color: '#000',
+                  backgroundColor: '#EEE',
+                  borderRadius: 20,
+                  paddingHorizontal: 25,
+                  paddingVertical: 4,
+                }}>
+                {item.date === todayDate ? "Today" : item.date === yesterdayDate ? "Yesterday" : item.date}
+              </Text>
+          </View>
+          ) : (null)}
         <TouchableHighlight 
-        underlayColor='rgba(73,182,17,1,0.5)'
-        onPress={() => console.log('short-press', item.id)}
-        onLongPress={() => console.log('long-press', item.id)}
+          underlayColor='rgba(73,182,17,1,0.5)'
+          onPress={() => console.log('short-press', item.id)}
+          onLongPress={e => copyToClipboard(item.message)}
           style={
             parseInt(item.touser) === parseInt(userdata.id)
               ? styles.mychatalign
@@ -170,6 +191,11 @@ const ViewChat = props => {
     );
   };
 
+  const copyToClipboard = text => {
+    Clipboard.setString(text);
+    ToastAndroid.show(`Message Copied`, ToastAndroid.LONG);
+  };
+
   return (
     <>
       <SafeAreaView style={style.body}>
@@ -177,8 +203,10 @@ const ViewChat = props => {
           <Appbar.BackAction onPress={() => props.navigation.goBack()} />
           <Appbar.Content
             title={userdata.name}
-            titleStyle={style.headertitle}
+            subtitle={typing === true ? `Typing...` : ``}
+            titleStyle={style.leftheadertitle}
           />
+          <Appbar.Action icon="dots-vertical" onPress={() => props.navigation.navigate('chatuser', {userprofile: userdata})} />
         </Appbar.Header>
 
         {Array.isArray(chatlist) && chatlist.length > 0 ? (
@@ -198,7 +226,9 @@ const ViewChat = props => {
             ) : null}
           </>
         ) : (
-          <ScrollView>{/* <Text> No Data </Text> */}</ScrollView>
+          <ScrollView>
+            
+            </ScrollView>
         )}
 
         <View style={{position: 'relative', left: 0, right: 0, bottom: 0}}>

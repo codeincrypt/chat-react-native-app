@@ -2,7 +2,10 @@ import React from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {View, Image, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {Avatar, Card, IconButton} from 'react-native-paper';
-import {fontFamilyBold} from '../../constant/fonts';
+import moment from 'moment';
+
+const todayDate = moment().format('DD MMM YYYY');
+  const yesterdayDate = moment().subtract(1, 'day').format('DD MMM YYYY')
 
 const ChatCompList = ({item, onPress}) => {
   return (
@@ -11,8 +14,6 @@ const ChatCompList = ({item, onPress}) => {
         style={{paddingTop: 17}}
         title={item.name}
         subtitle={item.lastmsg}
-        // left={(props) => <Avatar.Icon {...props} icon="folder" />}
-        // right={(props) => <IconButton {...props} icon="more-vert" onPress={() => {}} />}
         leftStyle={{marginRight: 30}}
         rightStyle={{marginRight: 15}}
         left={props => (
@@ -27,7 +28,12 @@ const ChatCompList = ({item, onPress}) => {
           </View>
         )}
         right={props => (
-          <Text style={styles.userstatus}>{item.userstatus}</Text>
+          <>
+            <Text style={styles.userstatus}>{item.userstatus === todayDate ? "Today" : item.userstatus === yesterdayDate ? "Yesterday" : item.userstatus}</Text>
+            {item.unseencount > 0 ? (
+              <Text style={styles.unseencount}>{item.unseencount}</Text>
+            ):null}
+          </>
         )}
       />
     </TouchableOpacity>
@@ -52,8 +58,20 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   userstatus: {
-    fontSize: 10,
+    fontSize: 12,
     color: '#555',
+  },
+  unseencount: {
+    marginTop:5,
+    backgroundColor: '#ee5253',
+    alignSelf: 'flex-end',
+    textAlign: 'center',
+    padding:3,
+    width:22,
+    height:22,
+    borderRadius:15,
+    fontSize: 13,
+    color: '#FFF',
   },
 });
 

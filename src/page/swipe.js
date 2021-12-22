@@ -24,7 +24,7 @@ const Slider = props => {
             resizeMode={'contain'}
           />
           <Text style={styles.title}>Chatapp</Text>
-          <Text style={styles.text}>The World fastest message app</Text>
+          <Text style={styles.text}>The latest chatting app</Text>
         </View>
         <View style={styles.slide}>
           <Image
@@ -32,9 +32,9 @@ const Slider = props => {
             style={styles.images}
             resizeMode={'contain'}
           />
-          <Text style={styles.title}>Fast</Text>
+          <Text style={styles.title}>Secure</Text>
           <Text style={styles.text}>
-            Chatapp delivers faster message then other
+          Messages are end to end encrypted
           </Text>
         </View>
         <View style={styles.slide}>

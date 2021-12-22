@@ -76,7 +76,7 @@ export const getSignupProfile = async (mobile, name, gender, dob) => {
   return data;
 };
 // FORGOT PASSWORD SEND OTP
-export const getResendOTP = async (mobile, otp) => {
+export const getResendOTP = async (mobile) => {
   const response = await fetch(`${URL_STRING}/authuser/resendotp`, {
     method:'POST',
     headers,
