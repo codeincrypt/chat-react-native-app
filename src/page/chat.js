@@ -9,19 +9,20 @@ import {
   TouchableOpacity,
   TouchableHighlight,
   TextInput,
-  ToastAndroid
+  ToastAndroid,
 } from 'react-native';
 import {Avatar, Appbar} from 'react-native-paper';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import IconButton from 'react-native-vector-icons/FontAwesome';
 import moment from 'moment';
 import _ from 'underscore';
+import {connect} from 'react-redux';
 
 import style from '../../style/style.js';
 
 import io from 'socket.io-client/dist/socket.io';
 import {WEBSOCKET} from '../../constant/config';
-import {GET_CHATVIEW, sendMessage, getProfile} from '../redux/actions/request';
+import {GET_CHATVIEW, sendMessage} from '../redux/actions/request';
 const socket = io(WEBSOCKET, {transports: ['websocket']}, {jsonp: false});
 import Clipboard from '@react-native-community/clipboard';
 
@@ -29,25 +30,19 @@ const ViewChat = props => {
   const userdata = props.route.params.item;
   const myid = props.route.params.id;
 
-  const [loading, setIsloading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
   const [chatlist, setChatlist] = useState([]);
-  const [chatuser, setChatUser] = useState();
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [typing, setTyping] = useState(false);
-  const [profiledata, setProfile] = useState('');
 
   const todayDate = moment().format('DD MMM YYYY');
-  const yesterdayDate = moment().subtract(1, 'day').format('DD MMM YYYY')
+  const yesterdayDate = moment().subtract(1, 'day').format('DD MMM YYYY');
 
   useEffect(() => {
     props.navigation.addListener('focus', () => {
       fetchChatList();
-      fetchProfile();
     });
     fetchChatList();
-    fetchProfile();
     socket.on('newmessage', data => {
       if (
         parseInt(myid) === parseInt(data.touser) &&
@@ -57,10 +52,12 @@ const ViewChat = props => {
       }
       setTyping(false);
     });
-    socket.on('typing', data => { 
-      console.log('touser', data.touser, myid)
-      console.log('fromuser', data.fromuser, userdata.id)
-      if (parseInt(data.touser) === parseInt(myid) && parseInt(data.fromuser) === parseInt(userdata.id) && data.typing === true) {
+    socket.on('typing', data => {
+      if (
+        parseInt(data.touser) === parseInt(myid) &&
+        parseInt(data.fromuser) === parseInt(userdata.id) &&
+        data.typing === true
+      ) {
         typingRunningTimeout();
       } else {
         setTimeout(typingTimeout, 3000);
@@ -71,18 +68,12 @@ const ViewChat = props => {
   // FETCH USER CHAT
   const fetchChatList = () => {
     GET_CHATVIEW(userdata.id).then(data => {
-      setChatUser(data.chatuser);
-      if(data.status === 'fail'){
+      if (data.status === 'fail') {
         setChatlist([]);
       } else {
         setChatlist(data.message);
+        console.log(data.message);
       }
-    });
-  };
-
-  const fetchProfile = () => {
-    getProfile().then(data => {
-      setProfile(data);
     });
   };
 
@@ -117,7 +108,7 @@ const ViewChat = props => {
     const currentdate = moment().format('DD MMM YYYY');
     const currenttime = moment().format('hh:mm A');
 
-    var message2 = message.replace(/^[ ]+/g, "");
+    var message2 = message.replace(/^[ ]+/g, '');
 
     if (message2 === '') {
       return;
@@ -144,23 +135,27 @@ const ViewChat = props => {
   const ItemList = ({item, index}) => {
     return (
       <View style={{paddingVertical: 5, paddingHorizontal: 15}}>
-          {item.matched === true ? (
-            <View style={{alignItems: 'center', padding: 10}}>
-              <Text
-                style={{
-                  fontSize: 11,
-                  color: '#000',
-                  backgroundColor: '#EEE',
-                  borderRadius: 20,
-                  paddingHorizontal: 25,
-                  paddingVertical: 4,
-                }}>
-                {item.date === todayDate ? "Today" : item.date === yesterdayDate ? "Yesterday" : item.date}
-              </Text>
+        {item.matched === true ? (
+          <View style={{alignItems: 'center', padding: 10}}>
+            <Text
+              style={{
+                fontSize: 11,
+                color: '#000',
+                backgroundColor: '#EEE',
+                borderRadius: 20,
+                paddingHorizontal: 25,
+                paddingVertical: 4,
+              }}>
+              {item.date === todayDate
+                ? 'Today'
+                : item.date === yesterdayDate
+                ? 'Yesterday'
+                : item.date}
+            </Text>
           </View>
-          ) : (null)}
-        <TouchableHighlight 
-          underlayColor='rgba(73,182,17,1,0.5)'
+        ) : null}
+        <TouchableHighlight
+          underlayColor="rgba(73,182,17,1,0.5)"
           onPress={() => console.log('short-press', item.id)}
           onLongPress={e => copyToClipboard(item.message)}
           style={
@@ -174,11 +169,14 @@ const ViewChat = props => {
                 ? styles.mychat
                 : styles.yourchat
             }>
-            <Text style={
+            <Text
+              style={
                 parseInt(item.touser) === parseInt(userdata.id)
                   ? styles.mychatmessage
                   : styles.yourchatmessage
-              }>{item.message}</Text>
+              }>
+              {item.message}
+            </Text>
             <Text
               style={
                 parseInt(item.touser) === parseInt(userdata.id)
@@ -189,6 +187,11 @@ const ViewChat = props => {
             </Text>
           </View>
         </TouchableHighlight>
+        {item.readby === 0 ? (
+          <Text style={styles.yourchattime}>Unseen</Text>
+        ) : (
+          <Text style={styles.yourchattime}>SEEN</Text>
+        )}
       </View>
     );
   };
@@ -208,13 +211,17 @@ const ViewChat = props => {
             subtitle={typing === true ? `Typing...` : ``}
             titleStyle={style.leftheadertitle}
           />
-          <Appbar.Action icon="dots-vertical" onPress={() => props.navigation.navigate('chatuser', {userprofile: userdata})} />
+          <Appbar.Action
+            icon="dots-vertical"
+            onPress={() =>
+              props.navigation.navigate('chatuser', {userprofile: userdata})
+            }
+          />
         </Appbar.Header>
 
         {Array.isArray(chatlist) && chatlist.length > 0 ? (
           <>
             <FlatList
-              // style={{marginBottom: 20}}
               data={chatlist}
               renderItem={ItemList}
               keyExtractor={(item, index) => index.toString()}
@@ -228,9 +235,7 @@ const ViewChat = props => {
             ) : null}
           </>
         ) : (
-          <ScrollView>
-            
-            </ScrollView>
+          <ScrollView></ScrollView>
         )}
 
         <View style={{position: 'relative', left: 0, right: 0, bottom: 0}}>
@@ -312,14 +317,14 @@ var styles = StyleSheet.create({
     fontSize: 10,
     marginTop: 5,
     marginBottom: -5,
-    alignSelf:'flex-end'
+    alignSelf: 'flex-end',
   },
   yourchattime: {
     color: '#000',
     fontSize: 10,
     marginTop: 5,
     marginBottom: -5,
-    alignSelf:'flex-end'
+    alignSelf: 'flex-end',
   },
   mychatmessage: {
     color: '#FFF',
@@ -350,4 +355,13 @@ var styles = StyleSheet.create({
   },
 });
 
-export default ViewChat;
+// export default ViewChat;
+
+const mapStateToProps = ({profile}) => {
+  // console.log('profile', JSON.stringify(profile, null, 2));
+  return {
+    profile,
+  };
+};
+
+export default connect(mapStateToProps)(ViewChat);

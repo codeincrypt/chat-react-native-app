@@ -78,11 +78,7 @@ const ChatList = props => {
         }
       />
     );
-  };
-
-  
-  // props.GET_CONTACT((data) => console.log('GET_CONTACT'), (e) => console.log({e}))
-  
+  };  
 
   const fetchChatList = () => {
     props.GET_CHATLIST((data) => {
@@ -133,20 +129,30 @@ const ChatList = props => {
       fetchChatList()
     });
     
-    // socket.on('newmessage', data => {
-    //   console.log('data', data)
-    //   // {"fromuser": 1, "touser": 2}
-    //   console.log('profile', profile, parseInt(profile.id), parseInt(data.touser))
-    //   if (parseInt(profile.id) === parseInt(data.touser)) {
-    //     console.log('if cond', userArrayList, parseInt(data.fromuser))
-    //     var checkdata = _.contains(userArrayList, parseInt(data.fromuser))
-    //     console.log('checkdata', checkdata)
-    //     if(checkdata === true) {
-    //       console.log('fetchChatList()');
-    //       fetchChatList();
-    //     }
-    //   }
-    // });
+    socket.on('newmessage', data => {
+      // console.log('data', data)
+      // {"fromuser": 1, "touser": 2}
+      // console.log('profile', profile, parseInt(profile.id), parseInt(data.touser))
+      if (parseInt(profile.id) === parseInt(data.touser)) {
+        // console.log('if cond', userArrayList, parseInt(data.fromuser))
+        // var checkdata = _.contains(userArrayList, parseInt(data.fromuser))
+        // console.log('checkdata', checkdata)
+        // if(checkdata === true) {
+        //   console.log('fetchChatList()');
+        //   fetchChatList();
+        // }
+        function userExists(userid) {
+          return chatlist.some(function(el) {
+            return parseInt(el.touser) === userid;
+          }); 
+        }
+
+        const userExistsc = userExists(data.fromuser)
+        console.log('userExistsc', userExistsc)
+      }
+    });
+
+
   }, []);
 
   if (nodataavail) {
@@ -291,7 +297,6 @@ var styles = StyleSheet.create({
 
 // export default ChatList;
 const mapStateToProps = state => {
-  console.log('MyaccountScreen', state )
   return {
     state,
   };
