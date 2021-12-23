@@ -57,8 +57,10 @@ const ViewChat = props => {
       }
       setTyping(false);
     });
-    socket.on('typing', data => {
-      if (parseInt(data.touser) === parseInt(myid) && data.typing === true) {
+    socket.on('typing', data => { 
+      console.log('touser', data.touser, myid)
+      console.log('fromuser', data.fromuser, userdata.id)
+      if (parseInt(data.touser) === parseInt(myid) && parseInt(data.fromuser) === parseInt(userdata.id) && data.typing === true) {
         typingRunningTimeout();
       } else {
         setTimeout(typingTimeout, 3000);
@@ -96,14 +98,14 @@ const ViewChat = props => {
     setMessage(data);
     if (data.length > 1) {
       var info = {
-        fromuser: '4',
+        fromuser: myid,
         touser: userdata.id,
         typing: true,
       };
       socket.emit('typing', info);
     } else {
       var info = {
-        fromuser: '4',
+        fromuser: myid,
         touser: userdata.id,
         typing: false,
       };

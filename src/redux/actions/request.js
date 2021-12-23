@@ -44,6 +44,48 @@ export const GET_CHATLIST =  (success,error) => async (dispatch) => {
   }
 }
 
+export const GET_STATUS =  (success,error) => async (dispatch) => {
+  const token = await AsyncStorage.getItem('thelvchatapp');
+  try {
+    const response = await  fetch(`${URL_STRING}/user/statusList`, {
+      method : "GET",
+      headers : {
+        'Content-type': 'application/json',
+        apikey: API_KEY,
+        Authorization: 'Bearer ' + token,
+      }
+    })
+  
+    const json = await response.json()
+    success(json)
+    dispatch({type : ACTIONS.GET_ABOUTUS, payload : json})
+    
+  } catch (e) {
+      error(e)
+  }
+}
+
+export const GET_USERS =  (success,error) => async (dispatch) => {
+  const token = await AsyncStorage.getItem('thelvchatapp');
+  try {
+    const response = await  fetch(`${URL_STRING}/user/chatContactUser`, {
+      method : "GET",
+      headers : {
+        'Content-type': 'application/json',
+        apikey: API_KEY,
+        Authorization: 'Bearer ' + token,
+      }
+    })
+  
+    const json = await response.json()
+    success(json)
+    dispatch({type : ACTIONS.GET_USERS, payload : json})
+    
+  } catch (e) {
+      error(e)
+  }
+}
+
 export const GET_CHATVIEW = async (id) => {
   const token = await AsyncStorage.getItem('thelvchatapp');
   const response = await fetch(`${URL_STRING}/user/userMessage/${id}`, {
@@ -71,7 +113,6 @@ export const getProfile = async () => {
   const data = await response.json();
   return data;
 };
-
 
 export const uploadProfilePicture = async (image) => {
   const token = await AsyncStorage.getItem('thelvchatapp');

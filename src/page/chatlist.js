@@ -12,8 +12,6 @@ import {
   ToastAndroid,
   Modal,
 } from 'react-native';
-import {Button} from 'react-native-paper';
-import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import _ from 'underscore';
 import Bottom from '../navs/Bottom';
@@ -26,19 +24,18 @@ const socket = io(WEBSOCKET, {transports: ['websocket']}, {jsonp: false});
 import {
   GET_PROFILE,
   GET_CHATLIST,
-  getChatList,
   moveToSeen,
-  getProfile,
   getAppSetting,
+  GET_USERS,
 } from '../redux/actions/request';
-// import { GET_CONTACT} from '../redux/actions/contact';
+import { GET_CONTACT} from '../redux/actions/contact';
 
 import {connect} from 'react-redux';
 import ChatCompList from '../components/chatcomp';
 
 const ChatList = props => {
+
   const [nodataavail, setNodataavail] = useState(false);
-  const [loading, setIsloading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [chatlist, setChatlist] = useState('');
   const [profile, setProfile] = useState('');
@@ -83,75 +80,73 @@ const ChatList = props => {
     );
   };
 
-  // props.GET_PROFILE((data) => setProfile(data), (e) => console.log({e}))
+  
   // props.GET_CONTACT((data) => console.log('GET_CONTACT'), (e) => console.log({e}))
-  // props.GET_CHATLIST((data) => {
-  //   console.log("hhjk",data)
-  //   setChatlist(data)
-  // }, (e) => console.log({e}))
+  
 
   const fetchChatList = () => {
-    getChatList().then(chatList => {
-      console.log('chatList', chatList)
-      if(chatList.status === "fail"){
+    props.GET_CHATLIST((data) => {
+      if(data.status === "fail"){
         setNodataavail(true)
       } else {
         setNodataavail(false)
-        setChatlist(chatList);
+        setChatlist(data);
       }
-    });
+      ToastAndroid.show(`Loading please wait...`, ToastAndroid.SHORT);
+    }, (e) => console.log({e}))
   };
 
-  const userArrayList = [];
+  // const userArrayList = [];
 
-  const fetchChatList2 = () => {
-    getChatList().then(chatList => {
-      if(chatList.status !== "fail"){
-        for(let chat of chatList){
-          userArrayList.push(parseInt(chat.id))
-        }
-      }
-    });
-  };
+  // const fetchChatList2 = () => {
+  //   getChatList().then(chatList => {
+  //     if(chatList.status !== "fail"){
+  //       for(let chat of chatList){
+  //         userArrayList.push(parseInt(chat.id))
+  //       }
+  //     }
+  //   });
+  // };
 
   const sendMoveToSeen = (id) => {
-    console.log('sendMoveToSeen', id)
     moveToSeen(id).then(data => {
       console.log('moveToSeen', data)
     });
   };
 
   const fetchProfile = () => {
-    getProfile().then(data => {
-      setProfile(data);
-      fetchChatList();
-      fetchChatList2();
-      console.log('setProfile', data)
-      socket.emit('userjoin', {userid: data.partnerid});
-    });
+    props.GET_PROFILE((data) => {
+      setProfile(data)
+      socket.emit('userjoin', {userid: data.id});
+    }, (e) => console.log({e}))
+    props.GET_USERS((data) => "", (e) => console.log({e}))
+    // fetchChatList2();
   };
 
   useEffect(() => {
     appsetting();
     fetchProfile();
+    fetchChatList()
     props.navigation.addListener('focus', () => {
       appsetting();
       fetchProfile();
+      fetchChatList()
     });
-    socket.on('newmessage', data => {
-      console.log('data', data)
-      // {"fromuser": 1, "touser": 2}
-      console.log('profile', profile, parseInt(profile.id), parseInt(data.touser))
-      if (parseInt(profile.id) === parseInt(data.touser)) {
-        console.log('if cond', userArrayList, parseInt(data.fromuser))
-        var checkdata = _.contains(userArrayList, parseInt(data.fromuser))
-        console.log('checkdata', checkdata)
-        if(checkdata === true) {
-          console.log('fetchChatList()');
-          fetchChatList();
-        }
-      }
-    });
+    
+    // socket.on('newmessage', data => {
+    //   console.log('data', data)
+    //   // {"fromuser": 1, "touser": 2}
+    //   console.log('profile', profile, parseInt(profile.id), parseInt(data.touser))
+    //   if (parseInt(profile.id) === parseInt(data.touser)) {
+    //     console.log('if cond', userArrayList, parseInt(data.fromuser))
+    //     var checkdata = _.contains(userArrayList, parseInt(data.fromuser))
+    //     console.log('checkdata', checkdata)
+    //     if(checkdata === true) {
+    //       console.log('fetchChatList()');
+    //       fetchChatList();
+    //     }
+    //   }
+    // });
   }, []);
 
   if (nodataavail) {
@@ -296,9 +291,10 @@ var styles = StyleSheet.create({
 
 // export default ChatList;
 const mapStateToProps = state => {
+  console.log('MyaccountScreen', state )
   return {
     state,
   };
 };
 
-export default connect(mapStateToProps, {GET_PROFILE, GET_CHATLIST})(ChatList);
+export default connect(mapStateToProps, {GET_PROFILE, GET_USERS, GET_CHATLIST})(ChatList);

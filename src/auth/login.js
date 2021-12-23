@@ -32,6 +32,7 @@ import {
   fontFamilyNormal,
   fontFamilyRegular,
 } from '../../constant/fonts';
+import {GET_PROFILE} from '../redux/actions/request'
 import {
   getLoginMobile,
   getLoginPassword,
@@ -43,12 +44,14 @@ import {
   getForgotOtpVerify,
   getForgotChangePassword,
 } from './request';
+
+
 // import {getAppSetting} from './../redux/store/index';
 import {APPSVERSION} from '../../constant/config';
 import Loader from '../components/loading';
 import {getAppSetting} from '../redux/actions/request';
 
-const LoginScreen = ({navigation, onDone}) => {
+const LoginScreen = (props) => {
   const toast = useRef(null);
 
   const {signIn} = useContext(UserContext);
@@ -121,12 +124,12 @@ const LoginScreen = ({navigation, onDone}) => {
               [
                 {
                   text: 'Cancel',
-                  onPress: () => navigation.navigate('SliderScreen'),
+                  onPress: () => props.navigation.navigate('SliderScreen'),
                   style: 'cancel',
                 },
                 {
                   text: 'OK',
-                  onPress: () => navigation.navigate('SliderScreen'),
+                  onPress: () => props.navigation.navigate('SliderScreen'),
                 },
               ],
               {cancelable: false},
@@ -179,12 +182,12 @@ const LoginScreen = ({navigation, onDone}) => {
               [
                 {
                   text: 'Cancel',
-                  onPress: () => navigation.navigate('SliderScreen'),
+                  onPress: () => props.navigation.navigate('SliderScreen'),
                   style: 'cancel',
                 },
                 {
                   text: 'OK',
-                  onPress: () => navigation.navigate('SliderScreen'),
+                  onPress: () => props.navigation.navigate('SliderScreen'),
                 },
               ],
               {cancelable: false},
@@ -405,7 +408,7 @@ const LoginScreen = ({navigation, onDone}) => {
     return (
       <SafeAreaView style={styles.body}>
         <Appbar.Header style={style.header}>
-          <Appbar.BackAction onPress={() => navigation.goBack()} />
+          <Appbar.BackAction onPress={() => props.navigation.goBack()} />
           <Appbar.Content title="Your Phone" titleStyle={style.headertitle} />
         </Appbar.Header>
         <Toast ref={toast} duration={3000} />
@@ -423,7 +426,7 @@ const LoginScreen = ({navigation, onDone}) => {
 
           <TouchableOpacity
             onPress={() =>
-              navigation.navigate('ForgotPassword', {mobile: mobile})
+              props.navigation.navigate('ForgotPassword', {mobile: mobile})
             }>
             <Text
               style={{

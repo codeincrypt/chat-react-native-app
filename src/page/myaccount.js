@@ -15,7 +15,10 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import ImagePicker from 'react-native-image-crop-picker';
 
-import {getProfile, uploadProfilePicture, getStatusList} from '../redux/actions/request';
+import { uploadProfilePicture} from '../redux/actions/request';
+import {connect} from 'react-redux';
+
+import { GET_PROFILE, GET_STATUS} from '../redux/actions/request';
 
 import Bottom from '../navs/Bottom';
 import {
@@ -24,20 +27,13 @@ import {
 } from '../../constant/fonts';
 import style from '../../style/style.js';
 
-const MyaccountScreen = props => {
+const MyaccountScreen = (props) => {
+  const profile = props.profile;
   const {signOut} = useContext(UserContext);
   const [loading, setIsloading] = useState(true);
 
-  const [statuslist, setStatusList] = useState('');
-  const [profiledata, setProfile] = useState('');
+  const [profiledata, setProfile] = useState(profile);
   const [profileimg, setProfileimg] = useState('https://chatapi.lvkart.com/default/default-user.png');
-
-  const fetchProfile = () => {
-    getProfile().then(data => {
-      setProfile(data);
-      setProfileimg(data.photo);
-    });
-  };
 
   const signOuts = () => {
     signOut();
@@ -57,20 +53,24 @@ const MyaccountScreen = props => {
   };
 
   const changeProfilePhoto = (image) => {
-    uploadProfilePicture(image)
-  }
-
-  const StatusList = () => {
-    getStatusList().then((result) => {
-      setStatusList(result)
+    uploadProfilePicture(image).then(profile => {
+      
     })
   }
 
+  const fetchProfile = () => {
+    props.GET_PROFILE((data) => {
+      setProfile(data)
+    }, (e) => console.log({e}))
+  }
+
   useEffect(() => {
-    StatusList();
+    setProfileimg(profile.photo)
+    fetchProfile();
     props.navigation.addListener('focus', () => {
       fetchProfile();
     });
+    props.GET_STATUS((data) => console.log(''), (e) => console.log({e}))
   }, []);
 
   if (loading) {
@@ -127,7 +127,7 @@ const MyaccountScreen = props => {
                 <Text style={styles.title2}>{profiledata.status}</Text>
               </View>
               <TouchableOpacity style={styles.paymodeboxicon2}
-                onPress={() => props.navigation.navigate('MyStatus', {profile: profiledata, statuslist:statuslist})}>
+                onPress={() => props.navigation.navigate('MyStatus')}>
                 <Icon name={'pencil'} size={18} color="#333" />
               </TouchableOpacity>
             </View>
@@ -246,4 +246,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
 });
-export default MyaccountScreen;
+
+const mapStateToProps = ({profile}) => {
+  return {
+    profile
+  };
+};
+
+export default connect(mapStateToProps, {GET_PROFILE, GET_STATUS})(MyaccountScreen);
+

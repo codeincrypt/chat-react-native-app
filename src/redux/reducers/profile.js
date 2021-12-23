@@ -1,12 +1,12 @@
 import { ACTIONS } from "../types"
 
 const intitial_state = {
-  "id": "",
-  "name": "",
-  "email": "",
-  "contact": "",
-  "status": "",
-  "photo": ""
+  contact: "",
+  email: "",
+  id: '',
+  name: "",
+  photo: "",
+  status: ""
 }
 
 export default (state = intitial_state, action) => {
