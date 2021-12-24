@@ -111,6 +111,7 @@ const ChatList = props => {
   };
 
   const fetchProfile = () => {
+    const users = {};
     props.GET_PROFILE((data) => {
       setProfile(data)
       socket.emit('userjoin', {userid: data.id});
@@ -130,29 +131,19 @@ const ChatList = props => {
     });
     
     socket.on('newmessage', data => {
-      // console.log('data', data)
-      // {"fromuser": 1, "touser": 2}
-      // console.log('profile', profile, parseInt(profile.id), parseInt(data.touser))
+      console.log('socket-newmessage-chatlist', data)
       if (parseInt(profile.id) === parseInt(data.touser)) {
-        // console.log('if cond', userArrayList, parseInt(data.fromuser))
-        // var checkdata = _.contains(userArrayList, parseInt(data.fromuser))
-        // console.log('checkdata', checkdata)
-        // if(checkdata === true) {
-        //   console.log('fetchChatList()');
-        //   fetchChatList();
-        // }
         function userExists(userid) {
           return chatlist.some(function(el) {
-            return parseInt(el.touser) === userid;
+            return parseInt(el.id) === userid;
           }); 
         }
 
         const userExistsc = userExists(data.fromuser)
-        console.log('userExistsc', userExistsc)
+        // console.log('userExistsc', userExistsc)
+        userExistsc === true && fetchChatList();
       }
     });
-
-
   }, []);
 
   if (nodataavail) {
@@ -297,6 +288,7 @@ var styles = StyleSheet.create({
 
 // export default ChatList;
 const mapStateToProps = state => {
+  // console.log('state', JSON.stringify(state, null,2) )
   return {
     state,
   };

@@ -45,8 +45,6 @@ import {
   getForgotChangePassword,
 } from './request';
 
-
-// import {getAppSetting} from './../redux/store/index';
 import {APPSVERSION} from '../../constant/config';
 import Loader from '../components/loading';
 import {getAppSetting} from '../redux/actions/request';
@@ -415,10 +413,11 @@ const LoginScreen = (props) => {
         <View style={{padding: 15}}>
           <View style={{marginTop: 50}}>
             <TextInput
-              label="Mobile or Email Id"
+              label="Mobile"
               mode="outlined"
               style={styles.inputBox}
               value={username}
+              keyboardType={'number-pad'}
               onChangeText={setUsername}
               theme={style.textinput}
             />
@@ -621,7 +620,7 @@ const LoginScreen = (props) => {
             }}>
             <Text style={styles.newuser}>Didn't receive code? </Text>
             <TouchableOpacity onPress={ResendRegOTP}>
-              <Text style={{fontFamily: fontFamilyBold, color: '#000'}}>
+              <Text style={{fontFamily: fontFamilyBold, color: '#E30047'}}>
                 Resend OTP
               </Text>
             </TouchableOpacity>

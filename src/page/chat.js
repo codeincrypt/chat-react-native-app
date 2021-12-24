@@ -31,6 +31,7 @@ const ViewChat = props => {
   const myid = props.route.params.id;
 
   const [chatlist, setChatlist] = useState([]);
+  const [showonline, setShowOnline] = useState('');
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [typing, setTyping] = useState(false);
@@ -38,11 +39,29 @@ const ViewChat = props => {
   const todayDate = moment().format('DD MMM YYYY');
   const yesterdayDate = moment().subtract(1, 'day').format('DD MMM YYYY');
 
+  
+  function intervalFunc() {
+    var info = {
+      touser: userdata.id,
+      fromuser: myid,
+      online : true
+    }
+    console.log('info, ', info)
+    socket.emit('readingchat', info)
+  }
+  setInterval(intervalFunc, 5000);
+
   useEffect(() => {
     props.navigation.addListener('focus', () => {
       fetchChatList();
     });
     fetchChatList();
+    socket.on("readingchat", (newdata) => {
+      if(userdata.id === myid){
+        console.log("hello", newdata)
+      }
+    })
+
     socket.on('newmessage', data => {
       if (
         parseInt(myid) === parseInt(data.touser) &&
@@ -187,11 +206,11 @@ const ViewChat = props => {
             </Text>
           </View>
         </TouchableHighlight>
-        {item.readby === 0 ? (
+        {/* {item.readby === 0 ? (
           <Text style={styles.yourchattime}>Unseen</Text>
         ) : (
           <Text style={styles.yourchattime}>SEEN</Text>
-        )}
+        )} */}
       </View>
     );
   };
