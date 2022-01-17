@@ -22,6 +22,14 @@ export default StyleSheet.create({
     right: 0,
     top: 0,
   },
+  mainheader: {
+    backgroundColor: '#FFF',
+    position: 'relative',
+    left: 0,
+    right: 0,
+    top: 0,
+    margin:4
+  },
   headertitle: {
     fontSize: 18,
     fontWeight: '300',

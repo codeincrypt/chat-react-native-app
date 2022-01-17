@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {View, TouchableOpacity, StyleSheet} from 'react-native';
+import {View, TouchableOpacity, Image, StyleSheet} from 'react-native';
 import {Text} from 'react-native-paper';
 import {fontFamilyNormal} from '../../constant/fonts';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -24,22 +24,37 @@ const Bottom = ({props}) => {
           <TouchableOpacity
             onPress={e => RedirectModule('Home')}
             style={styles.bottombtn}>
-            <Icon name={'comments'} size={22} color="#000" />
-            <Text style={styles.footertext}>Chat</Text>
+            {/* <Icon name={'comments'} size={22} color="#000" /> */}
+            <Image
+              source={require('../../assets/image/chat-icon.png')}
+              resizeMode={'contain'}
+              style={{width: 40, height: 40}}
+            />
+            {/* <Text style={styles.footertext}>Chat</Text> */}
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={e => RedirectModule('Contact')}
             style={styles.bottombtn}>
-            <Icon name={'address-book'} size={22} color="#000" />
-            <Text style={styles.footertext}>Contact</Text>
+            {/* <Icon name={'address-book'} size={22} color="#000" />
+            <Text style={styles.footertext}>Contact</Text> */}
+            <Image
+              source={require('../../assets/image/contact-icon.png')}
+              resizeMode={'contain'}
+              style={{width: 40, height: 40}}
+            />
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={e => RedirectModule('MyaccountScreen')}
             style={styles.bottombtn}>
-            <Icon name={'user'} size={22} color="#000" />
-            <Text style={styles.footertext}>Profile</Text>
+            {/* <Icon name={'user'} size={22} color="#000" />
+            <Text style={styles.footertext}>Profile</Text> */}
+            <Image
+              source={require('../../assets/image/profile-icon.png')}
+              resizeMode={'contain'}
+              style={{width: 40, height: 40}}
+            />
           </TouchableOpacity>
 
         </View>

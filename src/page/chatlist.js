@@ -13,7 +13,11 @@ import {
   Modal,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import IconButton from 'react-native-vector-icons/FontAwesome';
 import _ from 'underscore';
+import {Divider, Appbar} from 'react-native-paper';
+import {SafeAreaView} from 'react-native-safe-area-context';
+
 import Bottom from '../navs/Bottom';
 import style from '../../style/style.js';
 
@@ -28,13 +32,12 @@ import {
   getAppSetting,
   GET_USERS,
 } from '../redux/actions/request';
-import { GET_CONTACT} from '../redux/actions/contact';
+import {GET_CONTACT} from '../redux/actions/contact';
 
 import {connect} from 'react-redux';
 import ChatCompList from '../components/chatcomp';
 
 const ChatList = props => {
-
   const [nodataavail, setNodataavail] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [chatlist, setChatlist] = useState('');
@@ -70,76 +73,70 @@ const ChatList = props => {
     return (
       <ChatCompList
         item={item}
-        onPress={() =>
-          {
-            sendMoveToSeen(item.id)
-            props.navigation.navigate('Chat', {item: item, id: profile.id})
-          }
-        }
+        onPress={() => {
+          sendMoveToSeen(item.id);
+          props.navigation.navigate('Chat', {item: item, id: profile.id});
+        }}
       />
     );
-  };  
-
-  const fetchChatList = () => {
-    props.GET_CHATLIST((data) => {
-      if(data.status === "fail"){
-        setNodataavail(true)
-      } else {
-        setNodataavail(false)
-        setChatlist(data);
-      }
-      ToastAndroid.show(`Loading please wait...`, ToastAndroid.SHORT);
-    }, (e) => console.log({e}))
   };
 
-  // const userArrayList = [];
+  const fetchChatList = () => {
+    props.GET_CHATLIST(
+      data => {
+        if (data.status === 'fail') {
+          setNodataavail(true);
+        } else {
+          setNodataavail(false);
+          setChatlist(data);
+        }
+        ToastAndroid.show(`Loading please wait...`, ToastAndroid.SHORT);
+      },
+      e => console.log({e}),
+    );
+  };
 
-  // const fetchChatList2 = () => {
-  //   getChatList().then(chatList => {
-  //     if(chatList.status !== "fail"){
-  //       for(let chat of chatList){
-  //         userArrayList.push(parseInt(chat.id))
-  //       }
-  //     }
-  //   });
-  // };
-
-  const sendMoveToSeen = (id) => {
+  const sendMoveToSeen = id => {
     moveToSeen(id).then(data => {
-      console.log('moveToSeen', data)
+      console.log('moveToSeen', data);
     });
   };
 
   const fetchProfile = () => {
     const users = {};
-    props.GET_PROFILE((data) => {
-      setProfile(data)
-      socket.emit('userjoin', {userid: data.id});
-    }, (e) => console.log({e}))
-    props.GET_USERS((data) => "", (e) => console.log({e}))
-    // fetchChatList2();
+    props.GET_PROFILE(
+      data => {
+        setProfile(data);
+        socket.emit('userjoin', {userid: data.id});
+      },
+      e => console.log({e}),
+    );
+    props.GET_USERS(
+      data => '',
+      e => console.log({e}),
+    );
   };
 
   useEffect(() => {
     appsetting();
     fetchProfile();
-    fetchChatList()
+    fetchChatList();
     props.navigation.addListener('focus', () => {
       appsetting();
       fetchProfile();
-      fetchChatList()
+      fetchChatList();
     });
-    
+
     socket.on('newmessage', data => {
-      console.log('socket-newmessage-chatlist', data)
+      console.log('socket-newmessage-chatlist', data);
       if (parseInt(profile.id) === parseInt(data.touser)) {
         function userExists(userid) {
-          return chatlist.some(function(el) {
+          return chatlist.some(function (el) {
             return parseInt(el.id) === userid;
-          }); 
+          });
         }
 
-        const userExistsc = userExists(data.fromuser)
+        const userExistsc = userExists(data.fromuser);
         // console.log('userExistsc', userExistsc)
         userExistsc === true && fetchChatList();
       }
@@ -173,10 +170,35 @@ const ChatList = props => {
   }
 
   return (
-    <View style={style.body}>
+    <SafeAreaView style={style.body}>
+      {/* <View style={{width: '100%', height: 55, padding:15, flexDirection: 'row', backgroundColor:'#FFF'}}>
+        <Image
+          source={require('../../assets/image/logo.png')}
+          resizeMode={'contain'}
+          style={{width: '40%', height: 40}}
+        />
+        <View style={{width: '60%'}}>
+
+        </View>
+      </View> */}
+      <Appbar.Header style={style.mainheader}>
+        <Image
+          {...props}
+          source={require('../../assets/image/logo.png')}
+          resizeMode={'contain'}
+          style={{width: '40%', height: 40}}
+        />
+        <Appbar.Action
+          style={{alignContent: 'flex-end', alignItems: 'flex-end', flex: 1}}
+          icon="search-web"
+          onPress={() => props.navigation.navigate('chatuser')}
+        />
+      </Appbar.Header>
+      <Divider style={{borderBottomWidth: 3, borderBottomColor: '#8CC63F'}} />
+
       {Array.isArray(chatlist) && chatlist.length > 0 ? (
         <FlatList
-          style={{marginBottom: 60}}
+          // style={{paddingBottom: 10}}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
@@ -187,11 +209,10 @@ const ChatList = props => {
         />
       ) : (
         <ScrollView
+          style={style.body}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }>
-          
-        </ScrollView>
+          }></ScrollView>
       )}
 
       <Modal animationType="slide" transparent={true} visible={modalVisible}>
@@ -222,7 +243,7 @@ const ChatList = props => {
       </Modal>
 
       <Bottom props={props}></Bottom>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -294,4 +315,6 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps, {GET_PROFILE, GET_USERS, GET_CHATLIST})(ChatList);
+export default connect(mapStateToProps, {GET_PROFILE, GET_USERS, GET_CHATLIST})(
+  ChatList,
+);

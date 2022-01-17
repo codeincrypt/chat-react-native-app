@@ -1,7 +1,7 @@
 import React from 'react';
 import {View, Image, Text, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import style from '../../style/style'
+import style from '../../style/style';
 import {createStackNavigator} from '@react-navigation/stack';
 // import {DrawerContent} from './../navs/DrawerContent';
 
@@ -15,6 +15,7 @@ import MyStatusScreen from '../page/changeStatus';
 // CONTACT
 import ContactList from '../page/contact';
 import InviteNow from '../page/inviteNow';
+import { Divider } from 'react-native-paper';
 
 const HomeStack = createStackNavigator();
 const ProfileStack = createStackNavigator();
@@ -23,16 +24,20 @@ const ContactStack = createStackNavigator();
 const Stack = createStackNavigator();
 const logoIcon = () => {
   return (
-    <View style={{width: '100%', flexDirection: 'row'}}>
-      <Image
-        source={require('../../assets/image/chatapp-white.png')}
-        resizeMode={'contain'}
-        style={{width: '30%', height: 30, marginLeft: -20}}
-      />
-      <View style={{width:'70%'}}>
-      <Text style={style.headertitle}>ChatApp</Text>
+    <>
+      <View style={{width: '100%', height: 60, padding:15, flexDirection: 'row', backgroundColor:'red'}}>
+        <Image
+          source={require('../../assets/image/logo.png')}
+          resizeMode={'contain'}
+          style={{width: '40%', height: 30, marginLeft: -10, paddingVertical:30}}
+        />
+        <View style={{width: '60%'}}>
+
+        </View>
       </View>
-    </View>
+      <Divider style={{borderBottomWidth: 3, marginTop: 10, borderBottomColor: '#8CC63F'}} />
+      {/* <View style={{width: '100%', height: 4, backgroundColor: '#000',marginTop: 30, marginLeft: -15, marginRight: '-15%'}}></View> */}
+    </>
   );
 };
 
@@ -41,7 +46,7 @@ const createHomeStack = ({navigation}) => {
     <HomeStack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: '#111',
+          backgroundColor: '#fff',
         },
         headerTintColor: 'transparent',
       }}>
@@ -49,21 +54,27 @@ const createHomeStack = ({navigation}) => {
         name="Home"
         component={ChatList}
         options={{
-          headerTitle: () => logoIcon(),
+          headerShown: false,
         }}
+        // options={{
+        //   headerTitle: () => logoIcon(),
+        //   headerRight: () => (
+        //     <Button onPress={() => setCount(c => c + 1)} title="Update count" />
+        //   ),
+        // }}
       />
       <HomeStack.Screen
         name="Chat"
         component={ViewChat}
         options={{
-          headerShown:false
+          headerShown: false,
         }}
       />
       <HomeStack.Screen
         name="chatuser"
         component={userProfile}
         options={{
-          headerShown:false
+          headerShown: false,
         }}
       />
     </HomeStack.Navigator>
@@ -83,14 +94,14 @@ const createContactStack = ({navigation}) => {
         name="ContactScreen"
         component={ContactList}
         options={{
-          headerShown:false
+          headerShown: false,
         }}
       />
       <ContactStack.Screen
         name="InviteNow"
         component={InviteNow}
         options={{
-          headerShown:false
+          headerShown: false,
         }}
       />
     </ContactStack.Navigator>
@@ -110,14 +121,14 @@ const createProfileStack = ({navigation}) => {
         name="Myaccount"
         component={MyaccountScreen}
         options={{
-          headerShown:false
+          headerShown: false,
         }}
       />
       <ProfileStack.Screen
         name="MyStatus"
         component={MyStatusScreen}
         options={{
-          headerShown:false
+          headerShown: false,
         }}
       />
     </ProfileStack.Navigator>
@@ -128,14 +139,25 @@ export const UserNavigator = ({navigation}) => {
   return (
     <Stack.Navigator
       initialRouteName="HomeScreen"
-      drawerContent={(props) => <BottomContent {...props} />}
+      drawerContent={props => <BottomContent {...props} />}
       drawerContentOptions={{
         activeTintColor: '#352562',
-      }}
-      >
-      <Stack.Screen name="HomeScreen" component={createHomeStack} options={{headerShown:false}} />
-      <Stack.Screen name="Contact" component={createContactStack} options={{headerShown:false}} />
-      <Stack.Screen name="MyaccountScreen" component={createProfileStack} options={{headerShown:false}} />
+      }}>
+      <Stack.Screen
+        name="HomeScreen"
+        component={createHomeStack}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Contact"
+        component={createContactStack}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="MyaccountScreen"
+        component={createProfileStack}
+        options={{headerShown: false}}
+      />
     </Stack.Navigator>
   );
 };

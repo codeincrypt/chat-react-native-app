@@ -11,7 +11,6 @@ const ChatCompList = ({item, onPress}) => {
   return (
     <TouchableOpacity onPress={onPress}>
       <Card.Title
-        style={{paddingTop: 17}}
         title={item.name}
         subtitle={item.lastmsg}
         leftStyle={{marginRight: 30}}

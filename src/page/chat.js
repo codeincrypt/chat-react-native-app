@@ -46,7 +46,6 @@ const ViewChat = props => {
       fromuser: myid,
       online : true
     }
-    console.log('info, ', info)
     socket.emit('readingchat', info)
   }
   setInterval(intervalFunc, 5000);
